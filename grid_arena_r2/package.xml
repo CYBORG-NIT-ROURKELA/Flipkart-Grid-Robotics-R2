@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>grid_arena_r2</name>
+  <version>0.0.0</version>
+  <description>The grid_arena_r2 package</description>
+  <maintainer email="debruppanda01@gmail.com">Debrup Panda</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>gazebo_ros</build_depend>
+
+  <build_export_depend>gazebo_ros</build_export_depend>
+
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+    <gazebo_ros gazebo_media_path="${prefix}/models"/>
+  </export>
+</package>

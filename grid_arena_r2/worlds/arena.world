@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://arena_ground_2</uri>
+      <name>arena_ground_2</name>
+    </include>
+
+    <include>
+      <uri>model://overhead_camera</uri>
+      <name>overhead_camera</name>
+      <pose>0.1524 0 3 -1.57 1.57 0</pose>
+    </include>
+    
+    <model name="grid_robot">
+      <pose>-1.0954 0.3592 0 0 0 0</pose>
+        <include>
+            <uri>model://grid_robot_description</uri>
+        </include>
+    </model>
+  </world>
+</sdf>
