@@ -13,9 +13,9 @@
     <include>
       <uri>model://overhead_camera</uri>
       <name>overhead_camera</name>
-      <pose>0.1524 0 3 -1.57 1.57 0</pose>
+      <pose>0.1524 0 4 -1.57 1.57 0</pose>
     </include>
-    
+
     <model name="grid_robot">
       <pose>-1.0954 0.3592 0 0 0 0</pose>
         <include>
