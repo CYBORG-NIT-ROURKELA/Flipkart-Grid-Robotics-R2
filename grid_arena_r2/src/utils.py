@@ -26,4 +26,4 @@ def error_calculation(yi, yt, xt, xi, yc, ym, xc, xm):
     abs_angle_diff = abs(abs(angle_target) - abs(angle_bot))
     error = angle_target-angle_bot
 
-    return abs_angle_diff, error, euclidean_dist
+    return abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error

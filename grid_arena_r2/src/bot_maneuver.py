@@ -30,10 +30,10 @@ class BotManeuver:
 
         self.stage = 0
         # self.thresh_dist = 30
-        self.goal_array = [(281, 265), (331, 265), (331, 216), (281, 216), (281, 265), (231, 265)]
+        self.goal_array = [(281, 265), (331, 265), (331, 311), (331, 361), (331, 408), (331, 456), (384, 456), (231, 265)]
 
         self.intg, self.last_error = 0.0, 0.0
-        self.params = {'KP': 0.04, 'KD': 0.1, 'KI': 0, 'SP': 0.27}
+        self.params = {'KP': 0.04, 'KD': 0.2, 'KI': 0, 'SP': 0.27}
 
     def pid(self, error, const):
         prop = error
@@ -46,14 +46,31 @@ class BotManeuver:
     def stop(self):
         self.msg_twist.linear.x = 0
         self.msg_twist.angular.z = 0
+        self.pub_twist.publish(self.msg_twist)
         print("stopped")
 
-    def FollowStraight(self, euclidean_dist, linear_vel):
+    def FollowStraight(self, xt, xc, euclidean_dist, angle_target, cross_track_error, error, linear_vel):
         if euclidean_dist > 15:
             self.msg_twist.linear.x = linear_vel
         else:
             self.stop()
-            self.stage += 1
+            if self.stage < len(self.goal_array)-1:
+                self.stage += 1
+            if self.stage == len(self.goal_array)-1:
+                rospy.signal_shutdown("Maneuver done")
+
+        if 1.05 < angle_target < 2.09:
+            ang_vel = self.pid(cross_track_error, self.params)
+        elif -2.09 < angle_target < -1.05:
+            ang_vel = self.pid(cross_track_error, self.params)
+        elif -0.523 < angle_target < 0.523:
+            if xt > xc:
+                ang_vel = self.pid(-cross_track_error, self.params)
+            else:
+                ang_vel = self.pid(cross_track_error, self.params)
+            
+        self.msg_twist.angular.z = ang_vel
+        print(ang_vel)
 
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
@@ -69,13 +86,19 @@ class BotManeuver:
         self.msg_twist.angular.z = ang_vel
         print(ang_vel)
 
-    def maneuver(self, abs_angle_diff, error, euclidean_dist):
+    #xt: x coordinate of target point
+    #xc: x coordinate of center of bot
+    #abs_angle_diff  = abs(abs(desired orientation of bot)-abs(current orientation of bot))
+    #error = desired orientation of bot - current orientation of bot
+    #euclidean_dist = real time distance between bot center and target coordinate
+    #angle_target = desired orientation of bot
+    #cross_track_error = perpendicular distance of center of bot from the line joining the initial and target coordinates
+
+    def maneuver(self, xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error):
         if abs_angle_diff > 0.1:
             self.Rotate(error, abs_angle_diff)
-            self.FollowStraight(euclidean_dist, 0)
         else:
-            self.Rotate(error, abs_angle_diff)
-            self.FollowStraight(euclidean_dist, 0.27)
+            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.27)
 
     def callback(self, data):
         try:
@@ -94,12 +117,15 @@ class BotManeuver:
                 xt, yt = self.goal_array[int(self.stage)]
                 xi, yi = self.goal_array[int(self.stage) - 1]
 
-                if self.stage < len(self.goal_array)-1:
+                if self.stage < len(self.goal_array):
                     cv.arrowedLine(image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
                     cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
+
+                    abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
+
+                    self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
+
                     cv.imshow("frame", image)
-                    abs_angle_diff, error, euclidean_dist = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
-                    self.maneuver(abs_angle_diff, error, euclidean_dist)
 
                 self.pub_twist.publish(self.msg_twist)
 
