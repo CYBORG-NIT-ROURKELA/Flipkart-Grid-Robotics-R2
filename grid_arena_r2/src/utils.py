@@ -4,11 +4,13 @@ import math
 import numpy as np
 
 
-def detect_apriltag(image):
+def detect_apriltag(image, id):
     imgray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     detector = apriltag.Detector()
     results = detector.detect(imgray)
-    return results
+    for result in results:
+        if result.tag_id == id:
+            return [result]
 
 
 def error_calculation(yi, yt, xt, xi, yc, ym, xc, xm):

@@ -15,13 +15,13 @@ from utils import detect_apriltag, error_calculation
 from dynamic_reconfigure.server import Server
 from grid_arena.cfg import pidConfig
 
-class BotManeuver:
+class BotManeuver2:
     def __init__(self, goal_array):
 
-        rospy.init_node("bot_maneuver")
+        rospy.init_node("bot_maneuver_1")
 
         self.sub = rospy.Subscriber('/head/image_raw', Image, self.callback)
-        self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
+        self.pub_twist = rospy.Publisher('grid_robot_1/cmd_vel', Twist, queue_size=10)
         self.rate = rospy.Rate(10)
 
         self.msg_twist = Twist()
@@ -29,7 +29,7 @@ class BotManeuver:
 
 
         self.stage = 0
-        self.tag_id = 0
+        self.tag_id = 1
         # self.thresh_dist = 30
         self.goal_array = goal_array
 
@@ -76,11 +76,11 @@ class BotManeuver:
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
             if error > 3.14:
-                ang_vel = self.pid(20*(error-6.28), self.params)
+                ang_vel = self.pid(30*(error-6.28), self.params)
             elif error < -3.14:
-                ang_vel = self.pid(20*(error+6.28), self.params)
+                ang_vel = self.pid(30*(error+6.28), self.params)
             else:
-                ang_vel = self.pid(20*error, self.params)
+                ang_vel = self.pid(30*error, self.params)
         else:
             ang_vel = 0
 
@@ -126,7 +126,7 @@ class BotManeuver:
 
                     self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
 
-                    cv.imshow("frame", image)
+                    cv.imshow("frame_1", image)
 
                 self.pub_twist.publish(self.msg_twist)
 
@@ -137,7 +137,7 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    bm = BotManeuver(goal_array=[(281, 504), (331, 504), (331, 454), (331, 404), (331, 354), (331, 304), (331, 254), (331, 204), (231, 504)])
+    bm2 = BotManeuver2(goal_array = [(281, 504), (331, 504), (331, 454), (331, 404), (331, 354), (331, 304), (331, 254), (331, 204), (231, 504)])
     try:
         if not rospy.is_shutdown():
             rospy.spin()

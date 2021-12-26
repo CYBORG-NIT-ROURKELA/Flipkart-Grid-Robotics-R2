@@ -22,5 +22,12 @@
             <uri>model://grid_robot_description</uri>
         </include>
     </model>
+
+    <model name="grid_robot_1">
+      <pose>-1.0954 -0.3592 0 0 0 0</pose>
+        <include>
+            <uri>model://grid_robot_description_1</uri>
+        </include>
+    </model>
   </world>
 </sdf>
