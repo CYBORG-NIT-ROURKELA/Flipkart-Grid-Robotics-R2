@@ -21,7 +21,7 @@ class BotManeuver:
         rospy.init_node("bot_maneuver")
 
         self.sub = rospy.Subscriber('/head/image_raw', Image, self.callback)
-        self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
+        self.pub_twist = rospy.Publisher('grid_robot_0/cmd_vel', Twist, queue_size=10)
         self.rate = rospy.Rate(10)
 
         self.msg_twist = Twist()
@@ -137,7 +137,7 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    bm = BotManeuver(goal_array=[(281, 504), (331, 504), (331, 454), (331, 404), (331, 354), (331, 304), (331, 254), (331, 204), (231, 504)])
+    bm = BotManeuver(goal_array=[(281, 504), (331, 504)])
     try:
         if not rospy.is_shutdown():
             rospy.spin()

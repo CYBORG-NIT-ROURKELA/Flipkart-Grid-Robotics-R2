@@ -137,7 +137,7 @@ class BotManeuver2:
             print(e)
 
 if __name__ == '__main__':
-    bm2 = BotManeuver2(goal_array = [(281, 504), (331, 504), (331, 454), (331, 404), (331, 354), (331, 304), (331, 254), (331, 204), (231, 504)])
+    bm2 = BotManeuver2(goal_array = [(281, 504), (331, 504)])
     try:
         if not rospy.is_shutdown():
             rospy.spin()
