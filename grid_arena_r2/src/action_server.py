@@ -96,7 +96,6 @@ class BotManeuver:
                 ang_vel = self.pid(cross_track_error, self.params)
 
         self.msg_twist.angular.z = ang_vel
-        print(ang_vel)
 
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
@@ -110,7 +109,6 @@ class BotManeuver:
             ang_vel = 0
 
         self.msg_twist.angular.z = ang_vel
-        print(ang_vel)
 
     #xt: x coordinate of target point
     #xc: x coordinate of center of bot
@@ -156,11 +154,12 @@ class BotManeuver:
                         cv.imshow("frame_{}".format(self.tag_id), image)
 
                         if euclidean_dist < 15:
+                            self.stop()
                             self.success = True
 
                     self.pub_twist.publish(self.msg_twist)
 
-            cv.imshow("incoming image", image)
+            #cv.imshow("incoming image", image)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 rospy.signal_shutdown()
         except CvBridgeError as e:
@@ -182,11 +181,11 @@ class BotManeuver:
         # rospy.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (self._action_name, goal.order, self._feedback.sequence[0], self._feedback.sequence[1]))
 
 
-        #while not self.success:
-
-            # if cv.waitKey(1) & 0xFF == ord('q'):
-            #     rospy.signal_shutdown("user command")
-
+        while True:
+            if self.success is False:
+                continue
+            else:
+                break
 
 
 
@@ -210,6 +209,8 @@ class BotManeuver:
             self.goal_array = None
             rospy.loginfo('%s: Succeeded' % self._action_name)
             self._as.set_succeeded(self._result)
+        else:
+            rospy.loginfo("dekh")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
