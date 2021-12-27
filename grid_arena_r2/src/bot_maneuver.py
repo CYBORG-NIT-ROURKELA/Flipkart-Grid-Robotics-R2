@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import apriltag
 import rospy
@@ -16,12 +16,12 @@ from dynamic_reconfigure.server import Server
 from grid_arena.cfg import pidConfig
 
 class BotManeuver:
-    def __init__(self):
+    def __init__(self, goal_array):
 
         rospy.init_node("bot_maneuver")
 
         self.sub = rospy.Subscriber('/head/image_raw', Image, self.callback)
-        self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
+        self.pub_twist = rospy.Publisher('grid_robot_0/cmd_vel', Twist, queue_size=10)
         self.rate = rospy.Rate(10)
 
         self.msg_twist = Twist()
@@ -29,8 +29,9 @@ class BotManeuver:
 
 
         self.stage = 0
+        self.tag_id = 0
         # self.thresh_dist = 30
-        self.goal_array = [(281, 265), (331, 265), (331, 311), (331, 361), (331, 408), (331, 456), (384, 456), (231, 265)]
+        self.goal_array = goal_array
 
         self.intg, self.last_error = 0.0, 0.0
         self.params = {'KP': 0.04, 'KD': 0.2, 'KI': 0, 'SP': 0.27}
@@ -68,7 +69,7 @@ class BotManeuver:
                 ang_vel = self.pid(-cross_track_error, self.params)
             else:
                 ang_vel = self.pid(cross_track_error, self.params)
-            
+
         self.msg_twist.angular.z = ang_vel
         print(ang_vel)
 
@@ -87,6 +88,7 @@ class BotManeuver:
         print(ang_vel)
 
     #xt: x coordinate of target point
+    
     #xc: x coordinate of center of bot
     #abs_angle_diff  = abs(abs(desired orientation of bot)-abs(current orientation of bot))
     #error = desired orientation of bot - current orientation of bot
@@ -105,7 +107,7 @@ class BotManeuver:
             #recieving image
             image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
             #detecting apriltag
-            results = detect_apriltag(image)
+            results = detect_apriltag(image, self.tag_id)
 
             if len(results):
                 xc, yc = results[0].center
@@ -136,7 +138,7 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    bm = BotManeuver()
+    bm = BotManeuver(goal_array=[(281, 504), (331, 504)])
     try:
         if not rospy.is_shutdown():
             rospy.spin()
