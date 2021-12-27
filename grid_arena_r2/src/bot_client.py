@@ -7,35 +7,40 @@ import rospy
 
 # Brings in the SimpleActionClient
 import actionlib
-from grid_arena_r2.msg import botAction
+from grid_arena_r2.msg import botAction, botGoal
 
 # Brings in the messages used by the fibonacci action, including the
 # goal message and the result message.
-import actionlib_tutorials.msg
-
 
 def fibonacci_client():
+    print('init client')
     # Creates the SimpleActionClient, passing the type of the action
     # (FibonacciAction) to the constructor.
-    client = actionlib.SimpleActionClient('botAction_1', botAction)
-    client_2 = actionlib.SimpleActionClient('botAction_2', botAction)
+    client = actionlib.SimpleActionClient('botAction_0', botAction)
+    client_2 = actionlib.SimpleActionClient('botAction_1', botAction)
     # Waits until the action server has started up and started
     # listening for goals.
     client.wait_for_server()
     client_2.wait_for_server()
 
+    print('server active')
+
     # Creates a goal to send to the action server.
-    goal = botGoal(order=[(281, 504), (331, 504)])
-    goal2 = botGoal(order=[(281,265), (331,265)])
+    goal2 = botGoal(order=[281, 504, 331, 504])
+    goal = botGoal(order=[281, 265, 331, 265])
 
-
+    print('goals ready')
     # Sends the goal to the action server.
     client.send_goal(goal)
     client_2.send_goal(goal2)
 
+    print('goals sent')
+
     # Waits for the server to finish performing the action.
     client.wait_for_result()
     client_2.wait_for_result()
+
+    print('result received')
 
     # Prints out the result of executing the action
     return client.get_result()  # A FibonacciResult

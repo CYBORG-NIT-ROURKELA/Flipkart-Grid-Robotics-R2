@@ -1,5 +1,5 @@
 #goal definition
-int8[] order
+int32[] order
 ---
 #result definition
 ---

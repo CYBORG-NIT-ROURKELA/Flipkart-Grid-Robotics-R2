@@ -27,28 +27,39 @@ class BotManeuver:
 
     def __init__(self, name, args):
         self._action_name = f'{name}_{args.tag_id}'
+        print(self._action_name)
 
-        self.sub = rospy.Subscriber('/head/image_raw', Image, self.callback)
+
         formatting = None
         if args.tag_id == 0:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
         elif args.tag_id == 1:
             self.pub_twist = rospy.Publisher('grid_robot_{}/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
 
+        #self.rate = rospy.Rate(100)
         self.msg_twist = Twist()
         self.bridge = CvBridge()
 
         self.stage = 0
         self.tag_id = args.tag_id
+        print(self.tag_id)
         # self.thresh_dist = 30
         self.goal_array = None
         self.image = None
 
         self.intg, self.last_error = 0.0, 0.0
+        # self.rate.sleep()
         self.params = {'KP': 0.04, 'KD': 0.2, 'KI': 0, 'SP': 0.27}
 
         self._as = actionlib.SimpleActionServer(self._action_name, botAction, execute_cb=self.execute_cb, auto_start = False)
         self._as.start()
+        print('action server {} started'.format(args.tag_id))
+
+        self.sub = rospy.Subscriber('/head/image_raw', Image, self.callback)
+        self.success = False
+
+
+
 
     def pid(self, error, const):
         prop = error
@@ -73,7 +84,7 @@ class BotManeuver:
                 self.stage += 1
             if self.stage == len(self.goal_array)-1:
                 rospy.signal_shutdown("Maneuver done")
-
+        ang_vel = 0
         if 1.05 < angle_target < 2.09:
             ang_vel = self.pid(cross_track_error, self.params)
         elif -2.09 < angle_target < -1.05:
@@ -118,58 +129,63 @@ class BotManeuver:
     def callback(self, data):
         try:
             #recieving image
-            self.image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
+            image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
+            #detecting apriltag
+            results = detect_apriltag(image, self.tag_id)
+            if results is None or self.goal_array is None:
+                pass
+            else:
+                if len(results):
+                    xc, yc = results[0].center
+                    x1, y1 = results[0].corners[1]
+                    x2, y2 = results[0].corners[2]
+                    xm = (x1 + x2) / 2
+                    ym = (y1 + y2) / 2
+
+                    xt, yt = self.goal_array[int(self.stage)]
+                    xi, yi = self.goal_array[int(self.stage) - 1]
+
+                    if self.stage < len(self.goal_array):
+                        cv.arrowedLine(image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
+                        cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
+
+                        abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
+
+                        self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
+
+                        cv.imshow("frame_{}".format(self.tag_id), image)
+
+                        if euclidean_dist < 15:
+                            self.success = True
+
+                    self.pub_twist.publish(self.msg_twist)
+
+            cv.imshow("incoming image", image)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                rospy.signal_shutdown()
         except CvBridgeError as e:
             print(e)
 
     def execute_cb(self, goal):
         # helper variables
+
+        self.success = False
         r = rospy.Rate(1)
-        success = True
-        self.goal_array = goal
-        success = False
+        self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
 
         # append the seeds for the fibonacci sequence
-        self._feedback.sequence = []
-        self._feedback.sequence.append(0)
-        self._feedback.sequence.append(1)
+        # self._feedback.sequence = []
+        # self._feedback.sequence.append(0)
+        # self._feedback.sequence.append(1)
 
         # publish info to the console for the user
-        rospy.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (self._action_name, goal.order, self._feedback.sequence[0], self._feedback.sequence[1]))
+        # rospy.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (self._action_name, goal.order, self._feedback.sequence[0], self._feedback.sequence[1]))
 
 
-        while True:
-            #detecting apriltag
-            results = detect_apriltag(self.image, self.tag_id)
+        #while not self.success:
 
-            if len(results):
-                xc, yc = results[0].center
-                x1, y1 = results[0].corners[1]
-                x2, y2 = results[0].corners[2]
-                xm = (x1 + x2) / 2
-                ym = (y1 + y2) / 2
-
-                xt, yt = self.goal_array[int(self.stage)]
-                xi, yi = self.goal_array[int(self.stage) - 1]
-
-                if self.stage < len(self.goal_array):
-                    cv.arrowedLine(self.image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
-                    cv.arrowedLine(self.image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
-
-                    abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
-
-                    self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
-
-                    cv.imshow("frame", image)
-
-                    if euclidean_dist < 15:
-                        success = True
-                        break
-
-                self.pub_twist.publish(self.msg_twist)
-
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                rospy.signal_shutdown("user command")
+            # if cv.waitKey(1) & 0xFF == ord('q'):
+            #     rospy.signal_shutdown("user command")
 
 
 
@@ -189,8 +205,9 @@ class BotManeuver:
         #     # this step is not necessary, the sequence is computed at 1 Hz for demonstration purposes
         #     r.sleep()
 
-        if success:
+        if self.success:
             # self._result.sequence = self._feedback.sequence
+            self.goal_array = None
             rospy.loginfo('%s: Succeeded' % self._action_name)
             self._as.set_succeeded(self._result)
 
