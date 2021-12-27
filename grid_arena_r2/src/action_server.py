@@ -29,8 +29,6 @@ class BotManeuver:
         self._action_name = f'{name}_{args.tag_id}'
         print(self._action_name)
 
-
-        formatting = None
         if args.tag_id == 0:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
         elif args.tag_id == 1:
@@ -73,29 +71,31 @@ class BotManeuver:
         self.msg_twist.linear.x = 0
         self.msg_twist.angular.z = 0
         self.pub_twist.publish(self.msg_twist)
-        print("stopped")
+        # print("stopped")
 
     def FollowStraight(self, xt, xc, euclidean_dist, angle_target, cross_track_error, error, linear_vel):
-        if euclidean_dist > 15:
+        print(euclidean_dist)
+        if euclidean_dist > 25 or euclidean_dist < -25:
+            ang_vel = 0
+
+            if 1.05 < angle_target < 2.09:
+                ang_vel = self.pid(cross_track_error, self.params)
+            elif -2.09 < angle_target < -1.05:
+                ang_vel = self.pid(cross_track_error, self.params)
+            elif -0.523 < angle_target < 0.523:
+                if xt > xc:
+                    ang_vel = self.pid(-cross_track_error, self.params)
+                else:
+                    ang_vel = self.pid(cross_track_error, self.params)
+
             self.msg_twist.linear.x = linear_vel
+            self.msg_twist.angular.z = ang_vel
+            print("Following")
         else:
             self.stop()
-            if self.stage < len(self.goal_array)-1:
-                self.stage += 1
-            if self.stage == len(self.goal_array)-1:
-                rospy.signal_shutdown("Maneuver done")
-        ang_vel = 0
-        if 1.05 < angle_target < 2.09:
-            ang_vel = self.pid(cross_track_error, self.params)
-        elif -2.09 < angle_target < -1.05:
-            ang_vel = self.pid(cross_track_error, self.params)
-        elif -0.523 < angle_target < 0.523:
-            if xt > xc:
-                ang_vel = self.pid(-cross_track_error, self.params)
-            else:
-                ang_vel = self.pid(cross_track_error, self.params)
+            print("reached target coordinate")
+            self.success = True
 
-        self.msg_twist.angular.z = ang_vel
 
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
@@ -105,10 +105,11 @@ class BotManeuver:
                 ang_vel = self.pid(20*(error+6.28), self.params)
             else:
                 ang_vel = self.pid(20*error, self.params)
+            self.msg_twist.angular.z = ang_vel
+            print("rotating")
         else:
-            ang_vel = 0
+            self.stop()
 
-        self.msg_twist.angular.z = ang_vel
 
     #xt: x coordinate of target point
     #xc: x coordinate of center of bot
@@ -122,7 +123,7 @@ class BotManeuver:
         if abs_angle_diff > 0.1:
             self.Rotate(error, abs_angle_diff)
         else:
-            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.27)
+            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.18)
 
     def callback(self, data):
         try:
@@ -143,31 +144,23 @@ class BotManeuver:
                     xt, yt = self.goal_array[int(self.stage)]
                     xi, yi = self.goal_array[int(self.stage) - 1]
 
-                    if self.stage < len(self.goal_array):
-                        cv.arrowedLine(image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
-                        cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
+                    cv.arrowedLine(image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
+                    cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
 
-                        abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
+                    abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
 
-                        self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
+                    self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
 
-                        cv.imshow("frame_{}".format(self.tag_id), image)
-
-                        if euclidean_dist < 15:
-                            self.stop()
-                            self.success = True
+                    cv.imshow("frame_{}".format(self.tag_id), image)
 
                     self.pub_twist.publish(self.msg_twist)
 
-            #cv.imshow("incoming image", image)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 rospy.signal_shutdown()
         except CvBridgeError as e:
             print(e)
 
     def execute_cb(self, goal):
-        # helper variables
-
         self.success = False
         r = rospy.Rate(1)
         self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
@@ -180,15 +173,11 @@ class BotManeuver:
         # publish info to the console for the user
         # rospy.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (self._action_name, goal.order, self._feedback.sequence[0], self._feedback.sequence[1]))
 
-
         while True:
             if self.success is False:
                 continue
             else:
                 break
-
-
-
 
         # start executing the action
         # for i in range(1, goal.order):
@@ -223,5 +212,3 @@ if __name__ == '__main__':
         result = BotManeuver('botAction', args)
     except rospy.ROSInterruptException:
         print("program interrupted before completion", file=sys.stderr)
-
-#rosrun
