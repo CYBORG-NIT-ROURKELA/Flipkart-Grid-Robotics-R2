@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import apriltag
 # import argparse
@@ -132,14 +132,14 @@ class RobotsRelay:
 
                     cv.imshow('image', image)
 
-                    while self.stage < len(self.goal_array):
-                        if euclidean_dist > self.thresh_dist:
-                            if angle_error > 0.25:
-                                self.FollowNdRotate(angle_error, angle_orientation_factor, 0)
-                            else:
-                                self.FollowNdRotate(angle_error, angle_orientation_factor, self.params['SP'])
-                        else:
-                            self.stage += 1
+                    # while self.stage < len(self.goal_array):
+                    #     if euclidean_dist > self.thresh_dist:
+                    #         if angle_error > 0.25:
+                    #             self.FollowNdRotate(angle_error, angle_orientation_factor, 0)
+                    #         else:
+                    #             self.FollowNdRotate(angle_error, angle_orientation_factor, self.params['SP'])
+                    #     else:
+                    #         self.stage += 1
 
 
                     self.pub_twist.publish(self.msg_twist)
