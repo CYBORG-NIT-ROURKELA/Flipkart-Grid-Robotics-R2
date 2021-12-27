@@ -3,8 +3,6 @@
 import rospy
 import actionlib
 from grid_arena_r2.msg import botAction, botFeedback, botResult
-
-
 import argparse
 import apriltag
 import rospy
