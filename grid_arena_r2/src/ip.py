@@ -4,7 +4,7 @@ import numpy as np
 def nothing(x):
     pass
 
-frame = cv2.imread('image.png')
+frame = cv2.imread('image_2.png')
 frame = cv2.resize(frame, (640, 480))
 img_HSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -21,7 +21,7 @@ cv2.createTrackbar('highS',"image",0,255,nothing)
 cv2.createTrackbar('lowV',"image",0,255,nothing)
 cv2.createTrackbar('highV',"image",0,255,nothing)
 
-while(True):
+while True:
     h = cv2.getTrackbarPos("lowH", "image")
     s = cv2.getTrackbarPos("lowS", "image")
     v = cv2.getTrackbarPos("lowV", "image")

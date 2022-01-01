@@ -12,8 +12,8 @@ import math
 
 from utils import detect_apriltag, error_calculation
 
-from dynamic_reconfigure.server import Server
-from grid_arena.cfg import pidConfig
+# from dynamic_reconfigure.server import Server
+# from grid_arena.cfg import pidConfig
 
 class BotManeuver:
     def __init__(self, goal_array):
@@ -60,18 +60,29 @@ class BotManeuver:
             if self.stage == len(self.goal_array)-1:
                 rospy.signal_shutdown("Maneuver done")
 
-        if 1.05 < angle_target < 2.09:
+        ang_vel = 0
+
+        if 1.05 < angle_target <= 1.57:
+            ang_vel = self.pid(-cross_track_error, self.params)
+        elif 1.57 < angle_target < 2.09:
             ang_vel = self.pid(cross_track_error, self.params)
-        elif -2.09 < angle_target < -1.05:
+
+        elif -2.09 < angle_target <= -1.57:
             ang_vel = self.pid(cross_track_error, self.params)
+        elif -1.57 < angle_target < -1.05:
+            ang_vel = self.pid(-cross_track_error, self.params)
+
         elif -0.523 < angle_target < 0.523:
-            if xt > xc:
-                ang_vel = self.pid(-cross_track_error, self.params)
-            else:
-                ang_vel = self.pid(cross_track_error, self.params)
+            ang_vel = self.pid(-cross_track_error, self.params)
+
+        elif -3.15 < angle_target < -2.617:
+            ang_vel = self.pid(-cross_track_error, self.params)
+        elif 2.617 < angle_target < 3.15:
+            ang_vel = self.pid(cross_track_error, self.params)
+
+        print(angle_target, ang_vel)
 
         self.msg_twist.angular.z = ang_vel
-        print(ang_vel)
 
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
@@ -85,7 +96,6 @@ class BotManeuver:
             ang_vel = 0
 
         self.msg_twist.angular.z = ang_vel
-        print(ang_vel)
 
     #xt: x coordinate of target point
     #xc: x coordinate of center of bot
@@ -99,7 +109,7 @@ class BotManeuver:
         if abs_angle_diff > 0.1:
             self.Rotate(error, abs_angle_diff)
         else:
-            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.27)
+            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.1)
 
     def callback(self, data):
         try:
@@ -137,7 +147,7 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    bm = BotManeuver(goal_array=[(281, 504), (331, 504)])
+    bm = BotManeuver(goal_array=[(281, 265), (331, 265), (331, 215), (281, 215), (281, 265), (231, 265)])
     try:
         if not rospy.is_shutdown():
             rospy.spin()
