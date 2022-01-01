@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import apriltag
 import rospy
@@ -88,7 +88,6 @@ class BotManeuver:
         print(ang_vel)
 
     #xt: x coordinate of target point
-    
     #xc: x coordinate of center of bot
     #abs_angle_diff  = abs(abs(desired orientation of bot)-abs(current orientation of bot))
     #error = desired orientation of bot - current orientation of bot

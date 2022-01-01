@@ -36,6 +36,10 @@ class State(object):
         return self.location == state.location
     def __str__(self):
         return str((self.time, self.location.x, self.location.y))
+    # def check_time(self):
+    #     return self.time
+    # def find_location(self):
+    #     return self.location.x, self.location.y
 
 class Conflict(object):
     VERTEX = 1
@@ -218,7 +222,7 @@ class Environment(object):
 
     def make_agent_dict(self):
         for agent in self.agents:
-            print(agent)
+         
             start_state = State(0, Location(agent['start'][0], agent['start'][1]))
             goal_state = State(0, Location(agent['goal'][0], agent['goal'][1]))
 
@@ -235,6 +239,11 @@ class Environment(object):
         return solution
 
     def compute_solution_cost(self, solution):
+        for path in solution['agent0']:
+            print(path.time)
+            print(path.location)
+            print("time_{},coordinate_{}".format(path.time, path.location))
+
         return sum([len(path) for path in solution.values()])
 
 class HighLevelNode(object):
