@@ -3,8 +3,6 @@
 import rospy
 import actionlib
 from grid_arena_r2.msg import botAction, botFeedback, botResult
-
-
 import argparse
 import apriltag
 import rospy
@@ -15,6 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2 as cv
 import numpy as np
 import math
+import sys
 
 from utils import detect_apriltag, error_calculation
 
@@ -32,7 +31,7 @@ class BotManeuver:
         if args.tag_id == 0:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
         elif args.tag_id == 1:
-            self.pub_twist = rospy.Publisher('grid_robot_{}/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
+            self.pub_twist = rospy.Publisher('grid_robot_{}/bot1/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
 
         #self.rate = rospy.Rate(100)
         self.msg_twist = Twist()
@@ -43,6 +42,7 @@ class BotManeuver:
         print(self.tag_id)
         # self.thresh_dist = 30
         self.goal_array = None
+        self.prev_goal = None
         self.image = None
 
         self.intg, self.last_error = 0.0, 0.0
@@ -71,26 +71,32 @@ class BotManeuver:
         self.msg_twist.linear.x = 0
         self.msg_twist.angular.z = 0
         self.pub_twist.publish(self.msg_twist)
-        # print("stopped")
 
     def FollowStraight(self, xt, xc, euclidean_dist, angle_target, cross_track_error, error, linear_vel):
-        print(euclidean_dist)
-        if euclidean_dist > 25 or euclidean_dist < -25:
+        if euclidean_dist > 15 or euclidean_dist < -15:
             ang_vel = 0
 
-            if 1.05 < angle_target < 2.09:
+            if 1.05 < angle_target <= 1.57:
+                ang_vel = self.pid(-cross_track_error, self.params)
+            elif 1.57 < angle_target < 2.09:
                 ang_vel = self.pid(cross_track_error, self.params)
-            elif -2.09 < angle_target < -1.05:
-                ang_vel = self.pid(cross_track_error, self.params)
-            elif -0.523 < angle_target < 0.523:
-                if xt > xc:
-                    ang_vel = self.pid(-cross_track_error, self.params)
-                else:
-                    ang_vel = self.pid(cross_track_error, self.params)
 
+            elif -2.09 < angle_target <= -1.57:
+                ang_vel = self.pid(cross_track_error, self.params)
+            elif -1.57 < angle_target < -1.05:
+                ang_vel = self.pid(-cross_track_error, self.params)
+
+            elif -0.523 < angle_target < 0.523:
+                ang_vel = self.pid(-cross_track_error, self.params)
+
+            elif -3.15 < angle_target < -2.617:
+                ang_vel = self.pid(-cross_track_error, self.params)
+            elif 2.617 < angle_target < 3.15:
+                ang_vel = self.pid(cross_track_error, self.params)
+            
             self.msg_twist.linear.x = linear_vel
             self.msg_twist.angular.z = ang_vel
-            print("Following")
+
         else:
             self.stop()
             print("reached target coordinate")
@@ -100,13 +106,13 @@ class BotManeuver:
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > 0.1:
             if error > 3.14:
-                ang_vel = self.pid(20*(error-6.28), self.params)
+                ang_vel = self.pid(25*(error-6.28), self.params)
             elif error < -3.14:
-                ang_vel = self.pid(20*(error+6.28), self.params)
+                ang_vel = self.pid(25*(error+6.28), self.params)
             else:
-                ang_vel = self.pid(20*error, self.params)
+                ang_vel = self.pid(25*error, self.params)
             self.msg_twist.angular.z = ang_vel
-            print("rotating")
+
         else:
             self.stop()
 
@@ -151,7 +157,7 @@ class BotManeuver:
 
                     self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
 
-                    cv.imshow("frame_{}".format(self.tag_id), image)
+                    cv.imshow("fast_n_furious_{}".format(self.tag_id), image)
 
                     self.pub_twist.publish(self.msg_twist)
 
@@ -164,6 +170,9 @@ class BotManeuver:
         self.success = False
         r = rospy.Rate(1)
         self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
+        print('Incoming Goal ', self.goal_array, ' Previous Goal ', self.prev_goal)
+        # if self.goal_array == self.prev_goal:
+        #     self.success = True
 
         # append the seeds for the fibonacci sequence
         # self._feedback.sequence = []
@@ -195,6 +204,7 @@ class BotManeuver:
 
         if self.success:
             # self._result.sequence = self._feedback.sequence
+            self.prev_goal = self.goal_array
             self.goal_array = None
             rospy.loginfo('%s: Succeeded' % self._action_name)
             self._as.set_succeeded(self._result)

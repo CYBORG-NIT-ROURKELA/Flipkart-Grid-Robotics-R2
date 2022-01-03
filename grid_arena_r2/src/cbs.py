@@ -239,11 +239,6 @@ class Environment(object):
         return solution
 
     def compute_solution_cost(self, solution):
-        for path in solution['agent0']:
-            print(path.time)
-            print(path.location)
-            print("time_{},coordinate_{}".format(path.time, path.location))
-
         return sum([len(path) for path in solution.values()])
 
 class HighLevelNode(object):
