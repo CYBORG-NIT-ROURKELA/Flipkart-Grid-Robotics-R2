@@ -42,6 +42,8 @@ class Planned_path:
             cv_image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
             img = cv_image.copy()
             image = cv_image.copy()
+            cv.imwrite("image1.png",image)
+            exit(0)
             
 
             # while self.m<len(self.station1) and self.n<len(self.station2):
