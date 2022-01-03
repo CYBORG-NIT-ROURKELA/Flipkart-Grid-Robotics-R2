@@ -32,23 +32,23 @@ class Transmitter:
         self.servo_angle = 0
 
     def callback_twist(self, data):
-        if data.linear.x == 0 and data.angular.z != 0:
-            if data.angular.z > 0:
-                v1 = 0
-                v2 = (data.angular.z*0.0875)/2
-            else:
-                v1 = -(data.angular.z*0.0875)/2
-                v2 = 0
-        else:
-            v1 = data.linear.x - (data.angular.z*0.0875)/2
-            v2 = data.linear.x + (data.angular.z*0.0875)/2
+        # if data.linear.x == 0 and data.angular.z != 0:
+        #     if data.angular.z > 0:
+        #         v1 = 0
+        #         v2 = (data.angular.z*0.0875)/2
+        #     else:
+        #         v1 = -(data.angular.z*0.0875)/2
+        #         v2 = 0
+        # else:
+        v1 = data.linear.x - (data.angular.z*0.0875)/2
+        v2 = data.linear.x + (data.angular.z*0.0875)/2
 
         self.left_rpm = (30*v1)/(math.pi*0.03459)
         self.right_rpm = (30*v2)/(math.pi*0.03459)
         self.transmit()
 
     def rpm2pwm(self, rpm):
-        return rpm * 255 / 138
+        return rpm * 1024 / 138
 
     def callback_servo(self, data):
         self.servo_angle = data.data
