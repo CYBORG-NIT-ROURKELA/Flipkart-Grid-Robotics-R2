@@ -25,7 +25,7 @@ new_mtx=np.array([[ 335.03356934 ,   0. ,         313.84161596],
 #  [  0.00000000e+00,  0.97818140e+03,   2.22609825e+02],
 #  [  0.00000000e+00,   0.00000000e+00,   1.00000000e+00]])
 # cap = cv.VideoCapture('/home/pranav/Videos/Webcam/sample.webm')
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(2)
 while(True):
     _, image = cap.read()
     # image = image[60:420:0:640]
