@@ -30,8 +30,9 @@ class BotManeuver:
 
         if args.tag_id == 0:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
-        elif args.tag_id == 1:
-            self.pub_twist = rospy.Publisher('grid_robot_{}/bot1/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
+        else:
+            self.pub_twist = rospy.Publisher('grid_robot_{}/bot{}/cmd_vel'.format(args.tag_id,args.tag_id), Twist, queue_size=10)
+        
 
         #self.rate = rospy.Rate(100)
         self.msg_twist = Twist()
