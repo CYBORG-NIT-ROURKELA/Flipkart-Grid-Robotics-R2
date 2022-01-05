@@ -4,9 +4,8 @@ import math
 import numpy as np
 
 
-def detect_apriltag(image, id):
+def detect_apriltag(image, detector, id):
     imgray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    detector = apriltag.Detector()
     results = detector.detect(imgray)
     for result in results:
         if result.tag_id == id:
@@ -25,7 +24,7 @@ def error_calculation(yi, yt, xt, xi, yc, ym, xc, xm):
     cross_track_error = (m*xc-yc+yi-m*xi)/(m**2+1)**0.5
     angle_orientation_factor = (m*xm-ym+yc-m*xc)/(m**2+1)**0.5
 
-    abs_angle_diff = abs(abs(angle_target) - abs(angle_bot))
+    abs_angle_diff = abs(angle_target - angle_bot)
     error = angle_target-angle_bot
 
     return abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error

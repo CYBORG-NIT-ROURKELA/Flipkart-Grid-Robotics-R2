@@ -27,10 +27,10 @@ class ImageFeed:
                 new_mtx=np.array([[ 335.03356934 ,   0. ,         313.84161596],
                                   [   0.   ,       346.29098511 , 257.87514082],
                                   [   0.     ,       0.      ,      1.        ]])
-                                  
+
                 frame  = cv.undistort(frame, old_mtx, dist, None, new_mtx)
                 # cv.imshow('image', frame)
-                if cv.waitKey(30) & 0xFF == ord('q'):
+                if cv.waitKey(0) & 0xFF == ord('q'):
                     break
                 self.msg = self.bridge.cv2_to_imgmsg(frame, 'bgr8')
                 self.publish()
