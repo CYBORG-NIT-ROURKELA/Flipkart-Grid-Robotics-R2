@@ -28,10 +28,10 @@ class BotManeuver:
         self.rate = rospy.Rate(10)
 
         #parameters
-        self.thresh_dist = 19
+        self.thresh_dist = 7
         self.rotation_param = 32
         self.rotation_param_2 = 1
-        self.thresh_rotn = 0.5
+        self.thresh_rotn = 0.6
 
         self.msg_twist = Twist()
         self.bridge = CvBridge()
@@ -43,7 +43,7 @@ class BotManeuver:
         self.goal_array = goal_array
 
         self.intg, self.last_error = 0.0, 0.0
-        self.params = {'KP': 0.0093, 'KD': 0.1, 'KI': 0, 'SP': 0.27}
+        self.params = {'KP': 0.567, 'KD':4.8677, 'KI': 0, 'SP': 0.27}
 
     def pid(self, error, const):
         prop = error
@@ -71,6 +71,9 @@ class BotManeuver:
                 ang_vel = self.pid(self.rotation_param*error, self.params)
 
 
+            self.msg_twist.linear.x = linear_vel
+            self.msg_twist.angular.z = ang_vel
+            print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
             # if 1.05 < angle_target <= 1.57:
             #     ang_vel = self.pid(-self.rotation_param_2*cross_track_error, self.params)
             # elif 1.57 < angle_target < 2.09:
@@ -89,16 +92,13 @@ class BotManeuver:
             # elif 2.617 < angle_target < 3.15:
             #     ang_vel = self.pid(self.rotation_param_2*cross_track_error, self.params)
 
-            self.msg_twist.linear.x = linear_vel
-            self.msg_twist.angular.z = ang_vel
-            print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
         else:
             self.stop()
             if self.stage < len(self.goal_array)-2:
                 self.stage += 1
-            if self.stage == len(self.goal_array)-1:
+            if self.stage == len(self.goal_array)-2:
                 self.stop()
-                rospy.signal_shutdown("Maneuver done")
+                # rospy.signal_shutdown("Maneuver done")
 
     def Rotate(self, error, abs_angle_diff):
         if abs_angle_diff > self.thresh_rotn:
@@ -111,9 +111,9 @@ class BotManeuver:
 
             if self.msg_twist.linear.x == 0:
                 if ang_vel < 0:
-                    ang_vel = -1.2963
+                    ang_vel = -3
                 else:
-                    ang_vel = 1.2963
+                    ang_vel = 3
 
             # self.msg_twist.linear.x = 0
             self.msg_twist.angular.z = ang_vel
@@ -131,11 +131,11 @@ class BotManeuver:
     #cross_track_error = perpendicular distance of center of bot from the line joining the initial and target coordinates
 
     def maneuver(self, xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error):
-        if abs_angle_diff > self.thresh_rotn:
-            self.Rotate(error, abs_angle_diff)
-        else:
+        # if abs_angle_diff > self.thresh_rotn:
+        #     self.Rotate(error, abs_angle_diff)
+        # else:
             # self.stop()
-            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.06)
+        self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.6)
 
     def callback(self, data):
         try:
@@ -158,6 +158,7 @@ class BotManeuver:
 
                     if self.stage < len(self.goal_array):
                         cv.arrowedLine(image, (int(xi), int(yi)), (int(xt), int(yt)), (255, 0, 0), 2)
+                        cv.arrowedLine(image, (int(xc), int(yc)), (int(xt), int(yt)), (0, 0, 255), 2)
                         cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
 
                         abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
@@ -175,9 +176,14 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    bm = BotManeuver(goal_array=[(213, 199), (212, 222), (210, 247), (234, 247), (254, 247), (274, 246), (295, 246), (314, 248), (334, 246), (213, 175)]) #(210, 247), (334, 247)
+    goal_array = [(213, 199), (212, 222), (210, 247), (234, 247), (254, 247), (274, 246), (295, 246), (314, 248), (334, 246), (213, 175)]
+    # goal_array = [(314, 248), (295, 246), (274, 246), (254, 247), (234, 247), (210, 247), (212, 222), (213, 199), (213, 175), (334, 246)]
+    # goal_array = [(370, 402), (200, 188)]
+    # goal_array = goal_array[::-1]
+    #(210, 247), (334, 247)
     #(225, 287), (225, 335), (265, 384), (324, 384), (350, 335), (350, 287), (324, 230), (265, 235)]
-    #
+    bm = BotManeuver(goal_array)
+
     try:
         if not rospy.is_shutdown():
             rospy.spin()

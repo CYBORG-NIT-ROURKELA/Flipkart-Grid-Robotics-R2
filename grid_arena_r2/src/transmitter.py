@@ -34,11 +34,11 @@ class Transmitter:
     def callback_twist(self, data):
         # if data.linear.x == 0 and data.angular.z != 0:
         #     if data.angular.z > 0:
-        #         v1 = 0
-        #         v2 = (data.angular.z*0.0875)/2
-        #     else:
         #         v1 = -(data.angular.z*0.0875)/2
         #         v2 = 0
+        #     else:
+        #         v1 = 0
+        #         v2 = (data.angular.z*0.0875)/2
         # else:
         v1 = data.linear.x - (data.angular.z*0.0875)/2
         v2 = data.linear.x + (data.angular.z*0.0875)/2

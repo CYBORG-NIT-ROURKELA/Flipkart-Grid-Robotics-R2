@@ -13,7 +13,7 @@ def detect_apriltag(image, detector, id):
 
 
 def error_calculation(yi, yt, xt, xi, yc, ym, xc, xm):
-    angle_target = math.atan2((yi-yt), (xt - xi))
+    angle_target = math.atan2((yc-yt), (xt - xc))
 
     angle_bot = math.atan2((yc-ym),(xm-xc))
 
