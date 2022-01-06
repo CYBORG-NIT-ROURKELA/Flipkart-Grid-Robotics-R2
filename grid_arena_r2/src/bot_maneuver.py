@@ -74,23 +74,6 @@ class BotManeuver:
             self.msg_twist.linear.x = linear_vel
             self.msg_twist.angular.z = ang_vel
             print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
-            # if 1.05 < angle_target <= 1.57:
-            #     ang_vel = self.pid(-self.rotation_param_2*cross_track_error, self.params)
-            # elif 1.57 < angle_target < 2.09:
-            #     ang_vel = self.pid(cross_track_error, self.params)
-            #
-            # elif -2.09 < angle_target <= -1.57:
-            #     ang_vel = self.pid(self.rotation_param_2*cross_track_error, self.params)
-            # elif -1.57 < angle_target < -1.05:
-            #     ang_vel = self.pid(-self.rotation_param_2*cross_track_error, self.params)
-            #
-            # elif -0.523 < angle_target < 0.523:
-            #     ang_vel = self.pid(-self.rotation_param_2*cross_track_error, self.params)
-            #
-            # elif -3.15 < angle_target < -2.617:
-            #     ang_vel = self.pid(-self.rotation_param_2*cross_track_error, self.params)
-            # elif 2.617 < angle_target < 3.15:
-            #     ang_vel = self.pid(self.rotation_param_2*cross_track_error, self.params)
 
         else:
             self.stop()
@@ -98,28 +81,8 @@ class BotManeuver:
                 self.stage += 1
             if self.stage == len(self.goal_array)-2:
                 self.stop()
-                # rospy.signal_shutdown("Maneuver done")
 
-    def Rotate(self, error, abs_angle_diff):
-        if abs_angle_diff > self.thresh_rotn:
-            if error > 3.14:
-                ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
-            elif error < -3.14:
-                ang_vel = self.pid(self.rotation_param*(error+6.28), self.params)
-            else:
-                ang_vel = self.pid(self.rotation_param*error, self.params)
 
-            if self.msg_twist.linear.x == 0:
-                if ang_vel < 0:
-                    ang_vel = -3
-                else:
-                    ang_vel = 3
-
-            # self.msg_twist.linear.x = 0
-            self.msg_twist.angular.z = ang_vel
-            print("Rotating...Angular velocity: {} abs_angle_diff: {}".format(ang_vel, abs_angle_diff))
-        else:
-            self.stop()
 
 
     #xt: x coordinate of target point
@@ -131,10 +94,6 @@ class BotManeuver:
     #cross_track_error = perpendicular distance of center of bot from the line joining the initial and target coordinates
 
     def maneuver(self, xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error):
-        # if abs_angle_diff > self.thresh_rotn:
-        #     self.Rotate(error, abs_angle_diff)
-        # else:
-            # self.stop()
         self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.6)
 
     def callback(self, data):

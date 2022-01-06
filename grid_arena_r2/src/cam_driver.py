@@ -20,15 +20,15 @@ class ImageFeed:
         while not rospy.is_shutdown() and cap.isOpened():
             ret, frame = cap.read()
             if ret:
-                dist=np.array([[-0.25378681 , 0.02657608 , 0.0302187 , -0.00403553 , 0.046275 ,]])
-                old_mtx=np.array([[ 387.51367505   , 0.,          318.92583391],
-                                  [   0.    ,      393.26409928  ,237.04613992],
-                                  [   0.     ,       0.    ,        1.        ]])
-                new_mtx=np.array([[ 335.03356934 ,   0. ,         313.84161596],
-                                  [   0.   ,       346.29098511 , 257.87514082],
-                                  [   0.     ,       0.      ,      1.        ]])
+                # dist=np.array([[-0.25378681 , 0.02657608 , 0.0302187 , -0.00403553 , 0.046275 ,]])
+                # old_mtx=np.array([[ 387.51367505   , 0.,          318.92583391],
+                #                   [   0.    ,      393.26409928  ,237.04613992],
+                #                   [   0.     ,       0.    ,        1.        ]])
+                # new_mtx=np.array([[ 335.03356934 ,   0. ,         313.84161596],
+                #                   [   0.   ,       346.29098511 , 257.87514082],
+                #                   [   0.     ,       0.      ,      1.        ]])
 
-                frame  = cv.undistort(frame, old_mtx, dist, None, new_mtx)
+                # frame  = cv.undistort(frame, old_mtx, dist, None, new_mtx)
                 # cv.imshow('image', frame)
                 if cv.waitKey(0) & 0xFF == ord('q'):
                     break
