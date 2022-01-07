@@ -89,32 +89,22 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"],agent1_state["x_c"],agent1_state["y_c"]]]
             goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"],agent2_state["x_c"],agent2_state["y_c"]]]
 
-            #visualisation
-            # _, image = cap.read()
-            # cv.arrowedLine(image, (agent1_state["x_c"],agent1_state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
-            # cv.arrowedLine(image, (agent2_state["x_c"],agent2_state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot_color2, 2)
-            # print(goal_coords1, i, j)
 
             print("client 1 moving from => "+str(RealToDiscrete([agent1_state["x_c"],agent1_state["y_c"]])) + " => "+ str(RealToDiscrete([agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]])))
             print("client 2 moving from => "+str(RealToDiscrete([agent2_state["x_c"],agent2_state["y_c"]])) + " => "+ str(RealToDiscrete([agent2_rc[i+1]["x_c"],agent2_rc[i+1]["y_c"]])))
 
             # Creates a goal to send to the action server.
+
             goal = botGoal(order=goal_coords1[0])
             goal2 = botGoal(order=goal_coords2[0])
             print('goals ready')
+            
             # Sends the goal to the action server.
             client.send_goal(goal2)
             client_2.send_goal(goal)
 
-            # print('goals sent')
-            # # Waits for the server to finish performing the action.
-            # # client.wait_for_result()
             client.wait_for_result() and client_2.wait_for_result()
-            # cv.imshow("image", image)
-            # if cv.waitKey(1) == 27:
-            #     cv.destroyAllWindows()
-            #     break
-
+           
             print('result received')
             if i<len1-1:
                 i+=1
@@ -139,7 +129,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             
 
     return agent1_rc[i],agent2_rc[j],agent1_dropped,agent2_dropped
-    # return agent1_state,agent2_state,agent1_dropped,agent2_dropped
+    
 
 
 def where_to_where(dropped,current ,dock,dest,next_dest,iter):
