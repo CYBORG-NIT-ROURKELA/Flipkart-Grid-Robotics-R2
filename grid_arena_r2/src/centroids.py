@@ -5,10 +5,10 @@
 # d_x = 51.5
 # d_y = 47.5
 
-start_x = 51
+start_x = 54
 start_y = 460
-d_x = 37
-d_y = 37
+d_x = 36.2
+d_y = 36.5
 
 
 schedule = {}

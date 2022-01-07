@@ -25,8 +25,8 @@ station1,station2 = give_destination('/home/adyasha/flipkart_ws/src/Flipkart-Gri
 dock2 = [0,4]
 dock1 = [0,9]
 pseudodock2=[1,0]
-pseudodock1=[1,13]
-
+pseudodock1=[1,12]
+cap = cv.VideoCapture(2)
 class Bot:
     def __init__(self,start,drop_state,dest,home,pseudohome):
         self.initial = start
@@ -34,11 +34,16 @@ class Bot:
         self.destination = dest
         self.dock = home
         self.pseudodock = pseudohome
+        self.last = None
+        self.state = self.initial
         
 
     def update(self,coordinate_list):
         self.last = coordinate_list[-1]
         self.state = coordinate_list[0]
+
+    def __str__(self):
+        return "initial coord: "+str(self.initial) + "      destination coord: "+str(self.destination) + "      dropped status: "+str(self.dropped) + "     last coord: " + str(findDiscreteCoordinates(self.last)) + "      state: " + str(findDiscreteCoordinates(self.state))
 
 def fibonacci_client():
     print('init client')
@@ -51,6 +56,7 @@ def fibonacci_client():
     agent4 = Bot(pseudodock1,0,dock1,dock1,pseudodock1)
 
     while m<len(station1) and n<len(station2):
+        
         
         image = cv.imread('image1.png')
      
@@ -79,6 +85,11 @@ def fibonacci_client():
 def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4,image):
 
     print(m+1," packet from station 1 ",n+1," packet from station 2 ")
+    print ("agent1  ",str(agent1))
+    print ("agent2  ",str(agent2))
+    print ("agent3  ",str(agent3))
+    print ("agent4  ",str(agent4))
+    
 
     i=j=k=l=0
 
@@ -88,6 +99,7 @@ def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_
     len4 = append_coordinates(agent4_rc)
    
     while i<len1-1 and j<len2-1 and k<len3-1 and l<len4-1:
+            _,image = cap.read()
     
             cv.arrowedLine(image, (agent1.state["x_c"],agent1.state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
             cv.arrowedLine(image, (agent2.state["x_c"],agent2.state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot_color2, 2)
@@ -96,7 +108,7 @@ def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_
 
             cv.imshow('image',image)
 
-            if cv.waitKey(500)==27:
+            if cv.waitKey(100)==27:
                 cv.destroyAllWindows()
                 break
 

@@ -98,7 +98,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             goal = botGoal(order=goal_coords1[0])
             goal2 = botGoal(order=goal_coords2[0])
             print('goals ready')
-            
+
             # Sends the goal to the action server.
             client.send_goal(goal2)
             client_2.send_goal(goal)
@@ -112,14 +112,14 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 j+=1
             agent1_state = agent1_rc[i]
             agent2_state =  agent2_rc[j]
-            if agent1_state["x_c"] == 51 and agent1_state["y_c"]==312:
+            if findDiscreteCoordinates(agent1_state) == [0,4]:
                 print("agent1 dropped")
                 agent1_dropped = 2
             elif agent1_state == agent1_end:
                 agent1_dropped = 1
                 print("agent1 reached")
 
-            if agent2_state["x_c"] == 51 and agent2_state["y_c"]==127 :
+            if findDiscreteCoordinates(agent2_state) == [0,9] :
                 print("agent2 dropped")
                 agent2_dropped = 2
             elif agent2_state == agent2_end:
