@@ -1,9 +1,16 @@
 
 
-start_x = 225
-start_y = 696
-d_x = 51.5
-d_y = 47.5
+# start_x = 225
+# start_y = 696
+# d_x = 51.5
+# d_y = 47.5
+
+start_x = 51
+start_y = 460
+d_x = 37
+d_y = 37
+
+
 schedule = {}
 
 def findCoordinates(list,agent):
@@ -21,4 +28,5 @@ def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
     return discrete
 
     
-
+def RealToDiscrete(a):
+    return [int(round((a[0]-start_x)/d_x)), int(round((start_y-a[1])/d_y))]
