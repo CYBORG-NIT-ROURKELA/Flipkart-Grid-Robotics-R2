@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from destination import give_destination
-from schedule import find_schedule
+from schedule import find_schedule2
 from centroids import findCoordinates, findDiscreteCoordinates
 from grid_arena_r2.msg import botAction, botGoal
 import actionlib
@@ -33,7 +33,7 @@ def fibonacci_client():
             initial1 = findDiscreteCoordinates(initial1)
             initial2 = findDiscreteCoordinates(initial2)
         
-        schedule = find_schedule(initial1 , agent1_dest ,initial2, agent2_dest )
+        schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest )
 
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")

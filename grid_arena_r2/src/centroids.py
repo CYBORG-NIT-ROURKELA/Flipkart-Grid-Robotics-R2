@@ -19,6 +19,11 @@ def findCoordinates(list,agent):
 def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
     discrete = [int(round((a['x_c']-start_x)/d_x)),int(round((start_y-a['y_c'])/d_y))]
     return discrete
-    
+
+def RealToDiscrete(a):
+    return [int(round((a[0]-start_x)/d_x)), int(round((start_y-a[1])/d_y))]
+
+def findRealCoordinates(list):
+    return [int(start_x+(list[0]*d_x)), int(start_y-(list[1]*d_y))]
     
 

@@ -1,14 +1,49 @@
 import csv
 
-def give_destination(file_path):
-    param ={'1':{'Mumbai_alt': [3,12],'Delhi_alt':[7,12],'Kolkata_alt':[11,12],'Pune_alt':[2,2],'Ahmedabad_alt':[6,2],'Jaipur_alt':[10,2],'Mumbai': [3,9],'Delhi':[7,9],'Kolkata':[11,9],'Chennai':[3,8],'Bengaluru':[7,8],'Hyderabad':[11,8],'Pune':[3,4],'Ahmedabad':[7,4],'Jaipur':[11,4]},
-            '2': {'Mumbai': [3,9],'Delhi':[7,9],'Kolkata':[11,9],'Chennai':[3,5],'Bengaluru':[7,5],'Hyderabad':[11,5],'Pune':[3,4],'Ahmedabad':[7,4],'Jaipur':[11,4]}}
+param ={
+    '1': {
+            'Mumbai_alt': [3,12],
+            'Delhi_alt':[7,12],
+            'Kolkata_alt':[11,12],
+            'Pune_alt':[2,2],
+            'Ahmedabad_alt':[6,2],
+            'Jaipur_alt':[10,2],
+            'Mumbai': [3,9],
+            'Delhi':[7,9],
+            'Kolkata':[11,9],
+            'Chennai':[3,8],
+            'Bengaluru':[7,8],
+            'Hyderabad':[11,8],
+            'Pune':[3,4],
+            'Ahmedabad':[7,4],
+            'Jaipur':[11,4]
+    },
+    '2': {
+        'Mumbai': [3,9],
+        'Delhi':[7,9],
+        'Kolkata':[11,9],
+        'Chennai':[3,5],
+        'Bengaluru':[7,5],
+        'Hyderabad':[11,5],
+        'Pune':[3,4],
+        'Ahmedabad':[7,4],
+        'Jaipur':[11,4]}
+    }
+alt_param = {
+    'Mumbai_alt_alt': [4,9],
+    'Delhi_alt_alt': [8,12],
+    'Kolkata_alt_alt': [12,12],
+    'Pune_alt_alt': [3,1],
+    'Ahmedabad_alt_alt': [8,4],
+    'Jaipur_alt_alt': [12,4]
+}
 
+def give_destination(file_path):
 
     file = open(file_path)
     csvreader = csv.reader(file)
     header = next(csvreader)
-    print(header)
+    # print(header)
     rows = []
     station1 = []
     station2 = []
@@ -33,7 +68,7 @@ def give_destination(file_path):
 
     while i<l:
         if station1[i][2]==station2[i][2]:
-            print(station1[i][2])
+            # print(station1[i][2])
             x = station1[i][2]
             for key in param['1']:
                 if param['1'][key] == x:
