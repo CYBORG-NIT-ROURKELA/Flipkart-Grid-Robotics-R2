@@ -28,7 +28,7 @@ class BotManeuver:
         self.rate = rospy.Rate(10)
 
         #parameters
-        self.thresh_dist = 7
+        self.thresh_dist = 9
         self.rotation_param = 32
         self.rotation_param_2 = 1
         self.thresh_rotn = 0.6
@@ -38,12 +38,12 @@ class BotManeuver:
 
 
         self.stage = 0
-        self.tag_id = 2
+        self.tag_id = 5
         # self.thresh_dist = 30
         self.goal_array = goal_array
 
         self.intg, self.last_error = 0.0, 0.0
-        self.params = {'KP': 0.567, 'KD':4.8677, 'KI': 0, 'SP': 0.27}
+        self.params = {'KP': 0.79, 'KD':6, 'KI': 0, 'SP': 0.27}
 
     def pid(self, error, const):
         prop = error
@@ -81,6 +81,20 @@ class BotManeuver:
                 self.stage += 1
             if self.stage == len(self.goal_array)-2:
                 self.stop()
+
+    def Rotate(self, angle_target, error):
+        if abs_angle_diff > 0.2:
+            if error > 3.14:
+                ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
+            elif error < -3.14:
+                ang_vel = self.pid(self.rotation_param*(error+6.28), self.params)
+            else:
+                ang_vel = self.pid(self.rotation_param*error, self.params)
+
+            self.msg_twist.linear.x = 0
+            self.msg_twist.angular.z = ang_vel
+        else:
+            self.stop()
 
 
 
@@ -135,7 +149,8 @@ class BotManeuver:
             print(e)
 
 if __name__ == '__main__':
-    goal_array = [(213, 199), (212, 222), (210, 247), (234, 247), (254, 247), (274, 246), (295, 246), (314, 248), (334, 246), (213, 175)]
+    # goal_array = [(213, 199), (212, 222), (210, 247), (234, 247), (254, 247), (274, 246), (295, 246), (314, 248), (334, 246), (213, 175)]
+    goal_array = [(273, 205), (272,241),(272,278),(309,206),(346,206),(381,280),(382,243),(382,207),(383,170),(346,170),(310,169),(273,169)]
     # goal_array = [(314, 248), (295, 246), (274, 246), (254, 247), (234, 247), (210, 247), (212, 222), (213, 199), (213, 175), (334, 246)]
     # goal_array = [(370, 402), (200, 188)]
     # goal_array = goal_array[::-1]
