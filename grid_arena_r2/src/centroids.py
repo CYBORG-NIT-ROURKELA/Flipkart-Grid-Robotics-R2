@@ -1,14 +1,14 @@
 
 
-# start_x = 225
-# start_y = 696
-# d_x = 51.5
-# d_y = 47.5
+start_x = 225
+start_y = 696
+d_x = 51.5
+d_y = 47.5
 
-start_x = 54
-start_y = 460
-d_x = 36.2
-d_y = 36.5
+# start_x = 54
+# start_y = 460
+# d_x = 36.2
+# d_y = 36.5
 
 
 schedule = {}
@@ -30,3 +30,6 @@ def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
     
 def RealToDiscrete(a):
     return [int(round((a[0]-start_x)/d_x)), int(round((start_y-a[1])/d_y))]
+def findRealCoordinates(list):
+    return [int(start_x+(list[0]*d_x)), int(start_y-(list[1]*d_y))]
+    
