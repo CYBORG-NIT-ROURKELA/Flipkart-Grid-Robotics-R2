@@ -12,7 +12,6 @@ from grid_arena_r2.msg import botAction, botGoal
 import actionlib
 import cv2 as cv
 from copy import deepcopy
-import rospy
 
 '''assigning separate color for simulation purpose'''
 bot_color1 = (0,255,0)
@@ -108,47 +107,34 @@ def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_
     len4 = append_coordinates(agent4_rc)
     client = actionlib.SimpleActionClient('botAction_1', botAction)
     client_2 = actionlib.SimpleActionClient('botAction_2', botAction)
-    client_3= actionlib.SimpleActionClient('botAction_4', botAction)
-    client_4 = actionlib.SimpleActionClient('botAction_5', botAction)
-
+    client_3= actionlib.SimpleActionClient('botAction_3', botAction)
+    client_4 = actionlib.SimpleActionClient('botAction_4', botAction)
 
     client.wait_for_server()
     print("client 1 connected")
     client_2.wait_for_server()
-    print("client 2 connected")
+    print("client 1 connected")
     client_3.wait_for_server()
-    print("client 3 connected")
+    print("client 1 connected")
     client_4.wait_for_server()
-    print("client 4 connected")
+    print("client 1 connected")
 
-    print("aya")
-
-    
 
    
     while i<len1-1 and j<len2-1 and k<len3-1 and l<len4-1:
-          
-            goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"],agent1.state["x_c"],agent1.state["y_c"]]]
-            goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"],agent2.state["x_c"],agent2.state["y_c"]]]
-            goal_coords3 = [[agent3_rc[k+1]["x_c"],agent3_rc[k+1]["y_c"],agent3.state["x_c"],agent3.state["y_c"]]]
-            goal_coords4 = [[agent4_rc[l+1]["x_c"],agent4_rc[l+1]["y_c"],agent4.state["x_c"],agent4.state["y_c"]]]
+            image = cv.imread("image1.png")
+    
+            cv.arrowedLine(image, (agent1.state["x_c"],agent1.state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
+            cv.arrowedLine(image, (agent2.state["x_c"],agent2.state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot_color2, 2)
+            cv.arrowedLine(image, (agent3.state["x_c"],agent3.state["y_c"]), (agent3_rc[k+1]["x_c"],agent3_rc[k+1]["y_c"]), bot_color3, 2)
+            cv.arrowedLine(image, (agent4.state["x_c"],agent4.state["y_c"]), (agent4_rc[l+1]["x_c"],agent4_rc[l+1]["y_c"]), bot_color4, 2)
 
-            print(goal_coords1, goal_coords2, goal_coords3, goal_coords4)
+            cv.imshow('image',image)
 
-            goal = botGoal(order=goal_coords1[0])
-            goal2 = botGoal(order=goal_coords2[0])
-            goal3 = botGoal(order=goal_coords3[0])
-            goal4 = botGoal(order=goal_coords4[0])
-            print('goals ready')
-          
+            if cv.waitKey(50)==27:
+                cv.destroyAllWindows()
+                break
 
-            client.send_goal(goal2)
-            client_2.send_goal(goal)
-            client_3.send_goal(goal4)
-            client_4.send_goal(goal3)
-
-            client.wait_for_result() and client_2.wait_for_result() and client_3.wait_for_result() and client_4.wait_for_result()
-            print("results received")
             if i<len1-1:
                 i+=1
             if j<len2-1:
@@ -223,7 +209,7 @@ def update_next_goal(agent,iter,station):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node("chaar_bot_client")
+       
         fibonacci_client()
        
     except:
