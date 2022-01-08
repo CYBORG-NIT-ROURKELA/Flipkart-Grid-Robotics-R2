@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import rospy
 from sensor_msgs.msg import Image
@@ -46,6 +46,6 @@ class ImageFeed:
 if __name__ == '__main__':
     try:
         image_feed = ImageFeed()
-        image_feed.read(2)
+        image_feed.read(0)
     except rospy.ROSInterruptException as e:
         print(e)

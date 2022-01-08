@@ -13,6 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2 as cv
 import numpy as np
 import math
+import sys
 
 from utils import detect_apriltag, error_calculation
 
@@ -24,13 +25,14 @@ class BotManeuver:
     _result = botResult()
 
     def __init__(self, name, args):
-        self._action_name = f'{name}_{args.tag_id}'
+        self._action_name = str(name)+"_"+str(args.tag_id)
         print(self._action_name)
 
         if args.tag_id == 0:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
-        elif args.tag_id == 1:
-            self.pub_twist = rospy.Publisher('grid_robot_{}/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
+        else:
+            self.pub_twist = rospy.Publisher('grid_robot_{}/bot{}/cmd_vel'.format(args.tag_id,args.tag_id), Twist, queue_size=10)
+
 
         #self.rate = rospy.Rate(100)
         self.msg_twist = Twist()
