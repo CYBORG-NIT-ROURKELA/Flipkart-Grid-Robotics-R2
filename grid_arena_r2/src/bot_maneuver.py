@@ -82,7 +82,7 @@ class BotManeuver:
             if self.stage == len(self.goal_array)-2:
                 self.stop()
 
-    def Rotate(self, angle_target, error):
+    def Rotate(self, error):
         if abs_angle_diff > 0.2:
             if error > 3.14:
                 ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
