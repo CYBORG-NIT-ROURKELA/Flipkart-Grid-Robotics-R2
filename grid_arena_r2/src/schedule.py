@@ -56,3 +56,4 @@ def find_schedule2(start_1,goal_1,start_2,goal_2):
     output["schedule"] = solution
     output["cost"] = env.compute_solution_cost(solution)
     return output
+

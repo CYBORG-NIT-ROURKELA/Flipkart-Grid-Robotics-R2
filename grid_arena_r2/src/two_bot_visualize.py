@@ -27,7 +27,7 @@ def fibonacci_client():
         if type(initial1) == dict:
             initial1 = findDiscreteCoordinates(initial1)
             initial2 = findDiscreteCoordinates(initial2)
-
+        
         cv2.drawMarker(image, tuple(findRealCoordinates(agent2_dest)), bot2_color,1,10,3)
         cv2.drawMarker(image, tuple(findRealCoordinates(agent1_dest)), bot1_color,1,10,3)
 
@@ -36,7 +36,7 @@ def fibonacci_client():
         schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest)
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
-
+        
         agent1_end = agent1_rc[-1]
         agent2_end = agent2_rc[-1]
 
@@ -48,8 +48,8 @@ def fibonacci_client():
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
     cv2.destroyAllWindows()
 
-
-
+        
+       
 def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped, image):
     # print('Verifying Goal Coordinates for agent1')
     # for element in agent1_rc:
@@ -61,7 +61,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     len1 = len(agent1_rc)
     len2 = len(agent2_rc)
 
-
+    
     # if len1>len2:
     #     len1+=1
     # else:
@@ -70,7 +70,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     while i<len1-1 and j<len2-1:
             goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"],agent1_state["x_c"],agent1_state["y_c"]]]
             goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"],agent2_state["x_c"],agent2_state["y_c"]]]
-
+            
             cv2.arrowedLine(image, (agent1_state["x_c"]+3,agent1_state["y_c"]+4), (agent1_rc[i+1]["x_c"]+3,agent1_rc[i+1]["y_c"]+4), bot1_color, 2)
             cv2.arrowedLine(image, (agent2_state["x_c"],agent2_state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot2_color, 2)
 
@@ -94,13 +94,13 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 _, image = rotate_to_drop_vis(agent2_state.copy(), image)
                 #rotate_to_drop(agent2_state)
                 agent2_dropped = 1
-
+            
             cv2.imshow("image2", image)
             if cv2.waitKey(800) == 27:
                 cv2.destroyAllWindows()
                 break
 
-
+            
 
     return agent1_rc[i],agent2_rc[j],agent1_dropped,agent2_dropped
 
@@ -153,13 +153,13 @@ def rotate_to_drop_vis(coord, image):
 
 
 
-
+    
 
 if __name__ == '__main__':
     try:
         # rospy.init_node('fibonacci_client_py')
-
-
+       
+       
         fibonacci_client()
     except:
         pass

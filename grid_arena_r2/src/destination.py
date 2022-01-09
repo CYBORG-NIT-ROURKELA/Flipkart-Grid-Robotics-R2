@@ -8,7 +8,7 @@ def give_destination(file_path):
     file = open(file_path)
     csvreader = csv.reader(file)
     header = next(csvreader)
-
+ 
     rows = []
     station1 = []
     station2 = []
@@ -16,10 +16,10 @@ def give_destination(file_path):
         
         if row[1]=='1':
             row[2]=param['1'][row[2]]
-
+        
             station1.append(row)
-
-
+            
+            
         else:
             row[2]=param['2'][row[2]]
             station2.append(row)
@@ -33,7 +33,7 @@ def give_destination(file_path):
 
     while i<l:
         if station1[i][2]==station2[i][2]:
-
+           
             x = station1[i][2]
             for key in param['1']:
                 if param['1'][key] == x:
@@ -44,3 +44,5 @@ def give_destination(file_path):
 
     file.close()
     return [station1,station2]
+
+

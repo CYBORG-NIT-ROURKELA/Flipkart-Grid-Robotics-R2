@@ -36,11 +36,10 @@ class State(object):
         return self.location == state.location
     def __str__(self):
         return str((self.time, self.location.x, self.location.y))
-
-    def check_time(self):
-        return self.time
-    def find_location(self):
-        return self.location.x, self.location.y
+    # def check_time(self):
+    #     return self.time
+    # def find_location(self):
+    #     return self.location.x, self.location.y
 
 class Conflict(object):
     VERTEX = 1
@@ -223,7 +222,7 @@ class Environment(object):
 
     def make_agent_dict(self):
         for agent in self.agents:
-
+         
             start_state = State(0, Location(agent['start'][0], agent['start'][1]))
             goal_state = State(0, Location(agent['goal'][0], agent['goal'][1]))
 
@@ -315,20 +314,20 @@ class CBS(object):
 
 
 def main():
-
+    
 
     # Give input file
-
+    
     param = {'map':{'dimensions' : [15,15],'obstacles' : [(3, 3), (4, 3), (3, 4), (4, 4), (7, 3), (8, 3), (7, 4), (8, 4), (11, 3), (12, 3), (11, 4), (12, 4), (3, 7), (4, 7), (3, 8), (4, 8), (3, 11), (4, 11), (3, 12), (4, 12), (7, 7), (8, 7), (7, 8), (8, 8), (7, 11), (8, 11), (7, 12), (8, 12), (11, 7), (12, 7), (11, 8), (12, 8), (11, 11), (12, 11), (11, 12), (12, 12)]
 }}
     params ={'agents': [{'start': [0, 5], 'goal': [2, 11], 'name': 'agent0'}, {'start': [0, 10], 'goal': [2, 8], 'name': 'agent1'}]
 }
-
+    
     dimension = param["map"]["dimensions"]
     obstacles = param["map"]["obstacles"]
     agents = params['agents']
-
-
+    
+    
 
     env = Environment(dimension, agents, obstacles)
 

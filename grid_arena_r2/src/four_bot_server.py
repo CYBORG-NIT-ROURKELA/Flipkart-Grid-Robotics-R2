@@ -34,14 +34,14 @@ class BotManeuver:
         self.rotation_param = 32
 
         #PID Parameters for the bots
-        if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.564, 'KD': 4.8677, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 2: #PCB Marked 2
-            self.params = {'KP': 0.567, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
+        if args.tag_id == 2: #PCB marked 1
+            self.params = {'KP': 0.567, 'KD': 4.8677, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 1: #PCB Marked 2
+            self.params = {'KP': 0.56, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 4: #PCB marked 3
-            self.params = {'KP': 0.568, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.6, 'KD': 5, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 5: #Vero bot
-            self.params = {'KP': 0.79, 'KD': 6, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.77, 'KD': 6, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -56,7 +56,7 @@ class BotManeuver:
         print(self.tag_id)
 
         #Threshold distance for bot halting
-        self.thresh_dist = 9
+        self.thresh_dist = 7
 
         #apriltag detector
         self.detector = apriltag.Detector()

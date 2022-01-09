@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 import rospy
 import actionlib
@@ -32,7 +32,7 @@ class BotManeuver:
             self.pub_twist = rospy.Publisher('grid_robot/cmd_vel', Twist, queue_size=10)
         else:
             self.pub_twist = rospy.Publisher('grid_robot_{}/bot{}/cmd_vel'.format(args.tag_id,args.tag_id), Twist, queue_size=10)
-
+        
 
         #self.rate = rospy.Rate(100)
         self.msg_twist = Twist()
@@ -74,7 +74,7 @@ class BotManeuver:
         self.pub_twist.publish(self.msg_twist)
 
     def FollowStraight(self, xt, xc, euclidean_dist, angle_target, cross_track_error, error, linear_vel):
-        if euclidean_dist > 25 or euclidean_dist < -25:
+        if euclidean_dist > 15 or euclidean_dist < -15:
             ang_vel = 0
 
             if 1.05 < angle_target <= 1.57:
@@ -94,7 +94,7 @@ class BotManeuver:
                 ang_vel = self.pid(-cross_track_error, self.params)
             elif 2.617 < angle_target < 3.15:
                 ang_vel = self.pid(cross_track_error, self.params)
-
+            
             self.msg_twist.linear.x = linear_vel
             self.msg_twist.angular.z = ang_vel
 
@@ -130,7 +130,7 @@ class BotManeuver:
         if abs_angle_diff > 0.1:
             self.Rotate(error, abs_angle_diff)
         else:
-            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.1)
+            self.FollowStraight(xt, xc, euclidean_dist, angle_target, cross_track_error, error, 0.18)
 
     def callback(self, data):
         try:
@@ -222,4 +222,4 @@ if __name__ == '__main__':
         rospy.init_node('bot_maneuver_{}'.format(args.tag_id))
         result = BotManeuver('botAction', args)
     except rospy.ROSInterruptException:
-        print("program interrupted before completion", file=sys.stderr)
+        print("program interrupted before completion")

@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 import rospy
 import actionlib
@@ -34,13 +34,13 @@ class BotManeuver:
         self.rotation_param = 32
 
         #PID Parameters for the bots
-        if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.564, 'KD': 4.8677, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 2: #PCB Marked 2
-            self.params = {'KP': 0.567, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
+        if args.tag_id == 2: #PCB marked 1
+            self.params = {'KP': 0.567, 'KD': 4.8677, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 1: #PCB Marked 2
+            self.params = {'KP': 0.56, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
-        self.dropped = False
+
         #msgs
         self.msg_twist = Twist()
         self.bridge = CvBridge()
@@ -52,7 +52,7 @@ class BotManeuver:
         print(self.tag_id)
 
         #Threshold distance for bot halting
-        self.thresh_dist = 9
+        self.thresh_dist = 7
 
         #apriltag detector
         self.detector = apriltag.Detector()
@@ -114,24 +114,6 @@ class BotManeuver:
             print("reached target coordinate")
             self.success = True
 
-    def Rotate(self, error, abs_angle_diff):
-        if abs_angle_diff > 0.2:
-            if error > 3.14:
-                ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
-            elif error < -3.14:
-                ang_vel = self.pid(self.rotation_param*(error+6.28), self.params)
-            else:
-                ang_vel = self.pid(self.rotation_param*error, self.params)
-
-            self.msg_twist.linear.x = 0
-            self.msg_twist.angular.z = ang_vel
-        else:
-            self.stop()
-            print("Dropped Package")
-            self.dropped = False
-            self.success = True
-
-
     def callback(self, data):
         try:
             #recieving image
@@ -168,13 +150,11 @@ class BotManeuver:
                     cv.arrowedLine(image, (int(xc), int(yc)), (int(xt), int(yt)), (0, 0, 255), 2)
                     cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
 
-                    error, euclidean_dist, abs_angle_diff = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
+                    error, euclidean_dist = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
 
                     #maneuver function
-                    if self.dropped == False:
-                        self.FollowStraight(euclidean_dist, error, self.params['SP'])
-                    else:
-                        self.Rotate(error, abs_angle_diff)
+                    self.FollowStraight(euclidean_dist, error, self.params['SP'])
+
                     #DhoomOP :-)
                     cv.imshow("fast_n_furious_{}".format(self.tag_id), image)
 
@@ -190,8 +170,6 @@ class BotManeuver:
         self.success = False
         # r = rospy.Rate(1)
         self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
-        if len(goal.order) == 5:
-            self.dropped = True
         print('Incoming Goal ', self.goal_array, ' Previous Goal ', self.prev_goal)
         # if self.goal_array == self.prev_goal:
         #     self.success = True
