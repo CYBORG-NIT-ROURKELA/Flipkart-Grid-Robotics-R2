@@ -42,13 +42,13 @@ for i in range(7):
             del(cordx[:7])
             a = sorted(a, key = lambda y: y[1])
             final_cord.append(a)
-for c in final_cord:
-    for p in c:
-        cv2.drawMarker(image, tuple(p),(255,0,0), markerType=cv2.MARKER_CROSS, thickness=1)
-        cv2.imshow("image", image)
-        if cv2.waitKey(100) == 27:
-            cv2.destroyAllWindows()
-            break
+# for c in final_cord:
+#     for p in c:
+#         cv2.drawMarker(image, tuple(p),(255,0,0), markerType=cv2.MARKER_CROSS, thickness=1)
+#         cv2.imshow("image", image)
+#         if cv2.waitKey(100) == 27:
+#             cv2.destroyAllWindows()
+#             break
 final_cordinates={}
 k=0
 for i in range(14):
@@ -57,8 +57,7 @@ for i in range(14):
         for j in range(13):
             final_cordinates[(i+1,j)]=final_cord[i][12-j]
     else:
-        for j in range(6):            
+        for j in range(7):
             a=[0,1,4,5,8,9,12]
             final_cordinates[(i+1, a[j])] = final_cord[i][6-j]
 print(final_cordinates)
-
