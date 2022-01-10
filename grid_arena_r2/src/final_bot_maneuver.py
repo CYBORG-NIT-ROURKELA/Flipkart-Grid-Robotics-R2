@@ -35,9 +35,9 @@ class BotManeuver:
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.7, 'KD': 4.1, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 2: #PCB Marked 2
-            self.params = {'KP': 0.83, 'KD': 4.1, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.618, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 0: #PCB Marked 2
+            self.params = {'KP': 0.717, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -52,7 +52,7 @@ class BotManeuver:
         print(self.tag_id)
 
         #Threshold distance for bot halting
-        self.thresh_dist = 7
+        self.thresh_dist = 9
 
         #apriltag detector
         self.detector = apriltag.Detector()

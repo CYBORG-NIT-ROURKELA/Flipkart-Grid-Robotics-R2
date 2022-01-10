@@ -74,7 +74,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     len2 = len(agent2_rc)
 
     client = actionlib.SimpleActionClient('botAction_1', botAction)
-    client_2 = actionlib.SimpleActionClient('botAction_2', botAction)
+    client_2 = actionlib.SimpleActionClient('botAction_0', botAction)
 
     client.wait_for_server()
     print("client 1 connected")

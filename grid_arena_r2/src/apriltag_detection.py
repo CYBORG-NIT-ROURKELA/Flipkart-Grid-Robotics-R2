@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import cv2 as cv
 from cv_bridge import CvBridge, CvBridgeError
@@ -19,14 +19,17 @@ def callback(data):
         x1, y1 = result[0].center
         x1_1, y1_1 = result[0].corners[1]
         x1_2, y1_2 = result[0].corners[2]
+
+        xm, ym = (x1_1+x1_2)/2, (y1_1+y1_2)/2
         x1_3, y1_3 = result[0].corners[0]
         x1_4, y1_4 = result[0].corners[3]
 
         cv.circle(frame, (int(x1), int(y1)), 4, (255, 0, 0), -1)
-        cv.circle(frame, (int(x1_1), int(y1_1)), 4, (255, 0, 0), -1)
-        cv.circle(frame, (int(x1_2), int(y1_2)), 4, (255, 0, 0), -1)
-        cv.circle(frame, (int(x1_3), int(y1_3)), 4, (255, 0, 0), -1)
-        cv.circle(frame, (int(x1_4), int(y1_4)), 4, (255, 0, 0), -1)
+        cv.circle(frame, (int(xm), int(ym)), 4, (255, 0, 0), -1)
+        # cv.circle(frame, (int(x1_1), int(y1_1)), 4, (255, 0, 0), -1)
+        # cv.circle(frame, (int(x1_2), int(y1_2)), 4, (255, 0, 0), -1)
+        # cv.circle(frame, (int(x1_3), int(y1_3)), 4, (255, 0, 0), -1)
+        # cv.circle(frame, (int(x1_4), int(y1_4)), 4, (255, 0, 0), -1)
 
     cv.imshow('image', frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
