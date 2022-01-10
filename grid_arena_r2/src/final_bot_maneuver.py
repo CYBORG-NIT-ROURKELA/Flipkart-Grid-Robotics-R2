@@ -34,10 +34,10 @@ class BotManeuver:
         self.rotation_param = 32
 
         #PID Parameters for the bots
-        if args.tag_id == 2: #PCB marked 1
-            self.params = {'KP': 0.567, 'KD': 4.8677, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 1: #PCB Marked 2
-            self.params = {'KP': 0.56, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
+        if args.tag_id == 1: #PCB marked 1
+            self.params = {'KP': 0.6, 'KD': 4.1, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 2: #PCB Marked 2
+            self.params = {'KP': 0.7, 'KD': 4.1, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -107,7 +107,7 @@ class BotManeuver:
             self.msg_twist.linear.x = linear_vel
             self.msg_twist.angular.z = ang_vel
 
-            print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
+            # print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
 
         else:
             self.stop()
@@ -122,9 +122,8 @@ class BotManeuver:
             #detecting apriltag
             results = detect_apriltag(image, self.detector, self.tag_id)
 
-            if results is None or self.goal_array is None:
-                # print('No apriltag detected')
-                pass
+            if results is None or self.goal_array is None or len(results) == 0:
+                self.stop()
             # if results is None:
                 # print('No apriltag detected')
                 # pass

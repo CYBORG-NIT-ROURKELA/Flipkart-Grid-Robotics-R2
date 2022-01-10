@@ -7,7 +7,7 @@ import time
 
 import cv2
 
-
+cap = cv2.VideoCapture(0)
 
 bot1_color = (255,0,0)
 bot2_color = (0,255,0)
@@ -80,7 +80,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     # print("client 1 connected")
     # client_2.wait_for_server()
     # print("client 1 connected")
-    image = cv2.imread("pranav.png")
+    _, image = cap.read()
 
     if len1>len2:
         len1+=1
@@ -92,7 +92,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"],agent1_state["x_c"],agent1_state["y_c"]]]
             goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"],agent2_state["x_c"],agent2_state["y_c"]]]
 
-            cv2.arrowedLine(image, (agent1_state["x_c"]+3,agent1_state["y_c"]+4), (agent1_rc[i+1]["x_c"]+3,agent1_rc[i+1]["y_c"]+4), bot1_color, 2)
+            cv2.arrowedLine(image, (agent1_state["x_c"],agent1_state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot1_color, 2)
             cv2.arrowedLine(image, (agent2_state["x_c"],agent2_state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot2_color, 2)
 
             print("client 1 moving from => "+str(RealToDiscrete([agent1_state["x_c"],agent1_state["y_c"]])) + " => "+ str(RealToDiscrete([agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]])))
