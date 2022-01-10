@@ -2,7 +2,7 @@
 
 from destination import give_destination
 from schedule import find_schedule2
-from centroids import findCoordinates, findDiscreteCoordinates, RealToDiscrete
+from centroids import findCoordinates, findDiscreteCoordinates, RealToDiscrete, findRealCoordinates
 from grid_arena_r2.msg import botAction, botGoal
 import actionlib
 import rospy
@@ -118,13 +118,26 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             elif agent1_state == agent1_end:
                 agent1_dropped = 1
                 print("agent1 reached")
+                rotated_cord = rotate_to_drop(agent1_state)
+                goal1 = [[rotated_cord[0], rotated_cord[1], agent1_state['x_c'], agent1_state['y_c'], 1]]
+                goal = botGoal(order = goal1[0])
+                client_2.send_goal(goal)
+                print("client 1 delivering")
+                client_2.wait_for_result()
 
-            if findDiscreteCoordinates(agent2_state) == [0,9] :
+            if findDiscreteCoordinates(agent2_state) == [0,9]:
                 print("agent2 dropped")
                 agent2_dropped = 2
             elif agent2_state == agent2_end:
                 agent2_dropped = 1
                 print("agent2 reached")
+                rotated_cord = rotate_to_drop(agent2_state)
+
+                goal2 = [[rotated_cord[0], rotated_cord[1], agent2_state['x_c'], agent2_state['y_c'], 1]]
+                goal = botGoal(order = goal2[0])
+                client.send_goal(goal)
+                print("client 2 delivering")
+                client.wait_for_result()
 
             
 
@@ -145,6 +158,17 @@ def where_to_where(dropped,current ,dock,dest,next_dest,iter):
         initial = current
         final = next_dest
     return initial,final,iter,dropped
+
+def rotate_to_drop(coord):
+    b = findDiscreteCoordinates(coord)
+    if b[1]==1 or b[1]==5 or b[1]==9:
+        b[1]+=1
+    elif b[1]==4 or b[1]==8 or b[1]==12:
+        b[1]-=1
+    else:
+        b[0]+=1
+    rotated_coor = findRealCoordinates(b)
+    return rotated_coor
 
 
     

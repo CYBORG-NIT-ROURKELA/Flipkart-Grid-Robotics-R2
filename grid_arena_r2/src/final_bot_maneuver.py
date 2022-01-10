@@ -7,12 +7,13 @@ import argparse
 import apriltag
 import rospy
 from sensor_msgs.msg import Image
-from std_msgs.msg import UInt8
+from std_msgs.msg import Int64
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge, CvBridgeError
 import cv2 as cv
 import numpy as np
 import math
+import time
 
 from utils import detect_apriltag, error_calculation
 
@@ -29,15 +30,15 @@ class BotManeuver:
         print(self._action_name)
         #Publisher
         self.pub_twist = rospy.Publisher('grid_robot_{}/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
-
+        self.pub_servo = rospy.Publisher('grid_robot_{}/servo_angle'.format(args.tag_id), Int64, queue_size = 1)
         #multiplying factor
         self.rotation_param = 32
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.618, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.51, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 0: #PCB Marked 2
-            self.params = {'KP': 0.717, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.54, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -53,6 +54,8 @@ class BotManeuver:
 
         #Threshold distance for bot halting
         self.thresh_dist = 9
+
+        self.dropped = False
 
         #apriltag detector
         self.detector = apriltag.Detector()
@@ -112,6 +115,37 @@ class BotManeuver:
         else:
             self.stop()
             print("reached target coordinate")
+            self.dropped = False
+            self.success = True
+
+    def Rotate(self, error, abs_angle_diff):
+        if abs_angle_diff > 0.3:
+            if error > 3.14:
+                ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
+            elif error < -3.14:
+                ang_vel = self.pid(self.rotation_param*(error+6.28), self.params)
+            else:
+                ang_vel = self.pid(self.rotation_param*error, self.params)
+            
+            if ang_vel > 0:
+                ang_vel = 2.45
+            else:
+                ang_vel = -2.45 
+            
+            self.msg_twist.linear.x = 0
+            self.msg_twist.angular.z = ang_vel
+
+        else:
+            self.stop()
+            self.pub_servo.publish(-80)
+            self.pub_servo.publish(-80)
+            print("Dropped")
+            print('sleeping')
+            time.sleep(3)
+            self.pub_servo.publish(165)
+            # print('sleeping')
+            # time.sleep(1)
+            self.dropped = False
             self.success = True
 
     def callback(self, data):
@@ -149,10 +183,13 @@ class BotManeuver:
                     cv.arrowedLine(image, (int(xc), int(yc)), (int(xt), int(yt)), (0, 0, 255), 2)
                     cv.arrowedLine(image, (int(xc), int(yc)), (int(xm), int(ym)), (0, 255, 0), 2)
 
-                    error, euclidean_dist = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
+                    error, euclidean_dist, abs_angle_diff = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
 
                     #maneuver function
-                    self.FollowStraight(euclidean_dist, error, self.params['SP'])
+                    if self.dropped == False:
+                        self.FollowStraight(euclidean_dist, error, self.params['SP'])
+                    else:
+                        self.Rotate(error, abs_angle_diff)
 
                     #DhoomOP :-)
                     cv.imshow("fast_n_furious_{}".format(self.tag_id), image)
@@ -170,6 +207,9 @@ class BotManeuver:
         # r = rospy.Rate(1)
         self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
         print('Incoming Goal ', self.goal_array, ' Previous Goal ', self.prev_goal)
+
+        if len(goal.order)==5:
+            self.dropped = True
         # if self.goal_array == self.prev_goal:
         #     self.success = True
 
