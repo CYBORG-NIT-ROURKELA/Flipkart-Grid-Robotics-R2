@@ -29,7 +29,7 @@ class Transmitter:
 
         self.left_rpm = 0
         self.right_rpm = 0
-        self.servo_angle = 165
+        self.servo_angle = 0
 
     def callback_twist(self, data):
         v1 = data.linear.x - (data.angular.z*0.0875)/2

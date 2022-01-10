@@ -119,7 +119,7 @@ class BotManeuver:
             self.success = True
 
     def Rotate(self, error, abs_angle_diff):
-        if abs_angle_diff > 0.3:
+        if abs_angle_diff > 0.5:
             if error > 3.14:
                 ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
             elif error < -3.14:
@@ -128,21 +128,20 @@ class BotManeuver:
                 ang_vel = self.pid(self.rotation_param*error, self.params)
             
             if ang_vel > 0:
-                ang_vel = 2.45
+                ang_vel = 2
             else:
-                ang_vel = -2.45 
+                ang_vel = -2 
             
             self.msg_twist.linear.x = 0
             self.msg_twist.angular.z = ang_vel
 
         else:
             self.stop()
-            self.pub_servo.publish(-80)
-            self.pub_servo.publish(-80)
+            self.pub_servo.publish(1)
             print("Dropped")
             print('sleeping')
-            time.sleep(3)
-            self.pub_servo.publish(165)
+            time.sleep(2.3)
+            self.pub_servo.publish(0)
             # print('sleeping')
             # time.sleep(1)
             self.dropped = False
