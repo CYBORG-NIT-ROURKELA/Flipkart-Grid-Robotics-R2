@@ -8,12 +8,20 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>gazebo_ros</build_depend>
+<<<<<<< HEAD
   <build_depend>actionlib_msgs</build_depend>
 
   <build_export_depend>gazebo_ros</build_export_depend>
 
   <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>actionlib_msgs</exec_depend>
+=======
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_runtime</build_export_depend>
+
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+>>>>>>> 29958054251cac40e1172fd7a34ee1d3381a189c
 
   <export>
     <gazebo_ros gazebo_model_path="${prefix}/models"/>
