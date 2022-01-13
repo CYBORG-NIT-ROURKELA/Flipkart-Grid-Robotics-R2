@@ -30,7 +30,7 @@
         </include>
     </model>
 
-    <model name="grid_robot_2">
+    <!-- <model name="grid_robot_2">
       <pose>1.0954 0.3592 0 0 0 0</pose>
         <include>
             <uri>model://grid_robot_description_2</uri>
@@ -42,6 +42,6 @@
         <include>
             <uri>model://grid_robot_description_3</uri>
         </include>
-    </model>
+    </model> -->
   </world>
 </sdf>

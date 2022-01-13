@@ -25,6 +25,7 @@ rev_coords = reverse_mapping(cordinates)
 #     return schedule_list
 
 
+<<<<<<< HEAD
 # def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
 #     discrete = [int(round((a['x_c']-start_x)/d_x)),int(round((start_y-a['y_c'])/d_y))]
 #     return discrete
@@ -40,6 +41,17 @@ def findCoordinates(list,agent):
     points = input["schedule"][agent]
     schedule_list = [{'t':i["t"], 'x_c':cordinates[(i["x"], i["y"])][0], 'y_c':cordinates[(i["x"], i["y"])][1]} for i in points] 
     return schedule_list
+=======
+def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
+    discrete = [int(round((a['x_c']-start_x)/d_x)),int(round((start_y-a['y_c'])/d_y))]
+    return discrete
+
+def RealToDiscrete(a):
+    return [int(round((a[0]-start_x)/d_x)), int(round((start_y-a[1])/d_y))]
+
+def findRealCoordinates(list):
+    return [int(start_x+(list[0]*d_x)), int(start_y-(list[1]*d_y))]
+>>>>>>> 6a6ed95f288b9e2b50dc7531e0caf17b2f9a729f
     
 def findDiscreteCoordinates(a):#{'y_c': 648, 't': 9, 'x_c': 534}   [7,4]
     discrete = rev_coords[(a['x_c'], a['y_c'])]
