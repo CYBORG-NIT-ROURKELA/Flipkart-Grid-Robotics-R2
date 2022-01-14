@@ -56,6 +56,7 @@ class BotManeuver:
         self.thresh_dist = 9
 
         self.dropped = False
+        self.drop_count = 0
 
         #apriltag detector
         self.detector = apriltag.Detector()
@@ -126,26 +127,25 @@ class BotManeuver:
                 ang_vel = self.pid(self.rotation_param*(error+6.28), self.params)
             else:
                 ang_vel = self.pid(self.rotation_param*error, self.params)
-            
+
             if ang_vel > 0:
-                ang_vel = 2
+                ang_vel = 1.5
             else:
-                ang_vel = -2 
-            
+                ang_vel = -1.5
+
             self.msg_twist.linear.x = 0
             self.msg_twist.angular.z = ang_vel
 
         else:
             self.stop()
-            self.pub_servo.publish(1)
-            print("Dropped")
-            print('sleeping')
-            time.sleep(2.3)
-            self.pub_servo.publish(0)
-            # print('sleeping')
-            # time.sleep(1)
-            self.dropped = False
-            self.success = True
+            if self.drop_count == 0:
+                self.pub_servo.publish(1)
+                self.drop_count += 1
+            else:
+                self.pub_servo.publish(0)
+                self.dropped = False
+                self.success = True
+                self.drop_count = 0
 
     def callback(self, data):
         try:
