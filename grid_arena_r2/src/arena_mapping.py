@@ -3,7 +3,7 @@ import math
 import time
 import numpy as np
 from matplotlib import pyplot as plt
-import json
+import json, pprint
 # image=cv2.imread('prats.jpg')
 # img_grey=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
 # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
@@ -49,36 +49,34 @@ for i in range(7):
             del(cordx[:7])
             a = sorted(a, key = lambda y: y[1])
             final_cord.append(a)
-
-for c in final_cord:
-    for p in c:
-        cv2.drawMarker(blurred, tuple(p),(0,0,0), markerType=cv2.MARKER_CROSS, thickness=2)
-        cv2.imshow("image", blurred)
-        if cv2.waitKey(10) == 27:
-            cv2.destroyAllWindows()
-            break
-cv2.imwrite("out.jpg", blurred)
+# for c in final_cord:
+#     for p in c:
+#         cv2.drawMarker(blurred, tuple(p),(0,0,0), markerType=cv2.MARKER_CROSS, thickness=2)
+#         cv2.imshow("image", blurred)
+#         if cv2.waitKey(1000) == 27:
+#             cv2.destroyAllWindows()
+#             break
+# cv2.imwrite("out.jpg", blurred)
 final_cordinates={}
-k=0
 for i in range(14):
     # print(final_cordinates)
     if(len(final_cord[i])==13):
         for j in range(13):
-            final_cordinates[(i+1,j)]=final_cord[i][12-j]
+            final_cordinates[(i+1,j+1)]=final_cord[i][12-j]
     else:
         for j in range(7):
-            a=[0,1,4,5,8,9,12]
-            final_cordinates[(i+1, a[j])] = final_cord[i][6-j]
+            a=[1,4,5,8,9,12,13]
+            final_cordinates[(i+1,a[j])] = final_cord[i][6-j]
 print(final_cordinates)
-
-vis_image = cv2.imread("prats.jpg")
-for key in final_cordinates:
-    cv2.putText(vis_image, str(key), tuple(final_cordinates[key]), cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0,0,0), 1)
-
-cv2.imwrite("out_vis.jpg", vis_image)
-final_cordinate = {}
-for key in final_cordinates:
-    final_cordinate[str(key)] = final_cordinates[key]
-
-with open("cords.json", "w") as outfile:
-    json.dump(final_cordinate, outfile, indent=4)
+pprint.pprint(final_cordinates)
+# vis_image = cv2.imread("prats.jpg")
+# for key in final_cordinates:
+#     cv2.putText(vis_image, str(key), tuple(final_cordinates[key]), cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0,0,0), 1)
+#
+# cv2.imwrite("out_vis.jpg", vis_image)
+# final_cordinate = {}
+# for key in final_cordinates:
+#     final_cordinate[str(key)] = final_cordinates[key]
+#
+# with open("cords.json", "w") as outfile:
+#     json.dump(final_cordinate, outfile, indent=4)
