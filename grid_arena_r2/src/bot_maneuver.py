@@ -3,7 +3,7 @@
 import apriltag
 import rospy
 from sensor_msgs.msg import Image
-from std_msgs.msg import UInt8
+from std_msgs.msg import Int64
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge, CvBridgeError
 import cv2 as cv
@@ -25,6 +25,7 @@ class BotManeuver:
 
         self.sub = rospy.Subscriber('grid_robot/image_feed', Image, self.callback)
         self.pub_twist = rospy.Publisher('grid_robot_0/cmd_vel', Twist, queue_size=10)
+        self.pub_servo = rospy.Publisher('grid_robot_0/servo_angle', Int64, queue_size = 1)
         self.rate = rospy.Rate(10)
 
         #parameters
@@ -32,13 +33,14 @@ class BotManeuver:
         self.rotation_param = 32
         self.rotation_param_2 = 1
         self.thresh_rotn = 0.6
+        self.drop_count = 0
 
         self.msg_twist = Twist()
         self.bridge = CvBridge()
 
 
         self.stage = 0
-        self.tag_id = 5
+        self.tag_id = 0
         # self.thresh_dist = 30
         self.goal_array = goal_array
 
@@ -82,8 +84,8 @@ class BotManeuver:
             if self.stage == len(self.goal_array)-2:
                 self.stop()
 
-    def Rotate(self, angle_target, error):
-        if abs_angle_diff > 0.2:
+    def Rotate(self, abs_angle_diff, error):
+        if abs_angle_diff > 0.3:
             if error > 3.14:
                 ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
             elif error < -3.14:
@@ -91,10 +93,25 @@ class BotManeuver:
             else:
                 ang_vel = self.pid(self.rotation_param*error, self.params)
 
+            if ang_vel > 0:
+                ang_vel = 1.5
+            else:
+                ang_vel = -1.5
+
             self.msg_twist.linear.x = 0
             self.msg_twist.angular.z = ang_vel
         else:
             self.stop()
+            if self.drop_count == 0:
+            #     self.drop_count += 1
+            # elif self.drop_count == 1:
+                self.pub_servo.publish(1)
+                self.drop_count += 1
+            else:
+                self.pub_servo.publish(0)
+                self.drop_count = 0
+
+            # rospy.sleep(3)
 
 
 
@@ -136,7 +153,8 @@ class BotManeuver:
 
                         abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error = error_calculation(yi, yt, xt, xi, yc, ym, xc, xm)
 
-                        self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
+                        # self.maneuver(xt, xc, abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error)
+                        self.Rotate(abs_angle_diff, error)
 
                         cv.imshow("frame", image)
 

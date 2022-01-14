@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 bot_ips = {
-    2: '192.168.247.103',
-    1: '192.168.134.82'
+    2: '192.168.188.103',
+    1: '192.168.188.82' ,
+    3: '192.168.188.178'
 }
 
 import socket
@@ -54,16 +55,19 @@ def main():
         msg = "{},{},{}\r".format(left_speed, right_speed, servo_angle)
         sock.sendto(str.encode(msg), (ip_add, port))
 
-    def drop():
+    def drop_down():
         print("drop")
         left_speed = 0
         right_speed = 0
-        global drop_flag
-        if not drop_flag:
-            servo_angle = 180
-        else:
-            servo_angle = -180
-        drop_flag = not drop_flag
+        servo_angle = 1
+        msg = "{},{},{}\r".format(left_speed, right_speed, servo_angle)
+        sock.sendto(str.encode(msg), (ip_add, port))
+
+    def take_up():
+        print("up")
+        left_speed = 0
+        right_speed = 0
+        servo_angle = 0
         msg = "{},{},{}\r".format(left_speed, right_speed, servo_angle)
         sock.sendto(str.encode(msg), (ip_add, port))
 
@@ -119,7 +123,10 @@ def main():
             # stop()
 
         elif key_pressed == ord('d'):
-            drop()
+            drop_down()
+
+        elif key_pressed == ord('f'):
+            take_up()
 
         elif key_pressed == 32:
             stop(0)
