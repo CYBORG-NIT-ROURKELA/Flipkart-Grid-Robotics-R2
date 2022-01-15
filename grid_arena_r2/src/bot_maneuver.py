@@ -24,7 +24,7 @@ class BotManeuver:
         rospy.init_node("bot_maneuver")
 
         self.sub = rospy.Subscriber('grid_robot/image_feed', Image, self.callback)
-        self.pub_twist = rospy.Publisher('grid_robot_0/cmd_vel', Twist, queue_size=10)
+        self.pub_twist = rospy.Publisher('grid_robot_0/cmd_vel', Twist, queue_size=1)
         self.pub_servo = rospy.Publisher('grid_robot_0/servo_angle', Int64, queue_size = 1)
         self.rate = rospy.Rate(10)
 
@@ -103,12 +103,12 @@ class BotManeuver:
         else:
             self.stop()
             if self.drop_count == 0:
-            #     self.drop_count += 1
-            # elif self.drop_count == 1:
                 self.pub_servo.publish(1)
                 self.drop_count += 1
             else:
                 self.pub_servo.publish(0)
+                rospy.sleep(3)
+                print('slept')
                 self.drop_count = 0
 
             # rospy.sleep(3)
