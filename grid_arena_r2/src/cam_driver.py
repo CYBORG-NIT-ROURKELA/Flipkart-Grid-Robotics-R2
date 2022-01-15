@@ -38,6 +38,6 @@ class ImageFeed:
 if __name__ == '__main__':
     try:
         image_feed = ImageFeed()
-        image_feed.read(0)
+        image_feed.read(2)
     except rospy.ROSInterruptException as e:
         print(e)

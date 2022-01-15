@@ -111,6 +111,8 @@ class BotManeuver:
             self.msg_twist.linear.x = linear_vel
             self.msg_twist.angular.z = ang_vel
 
+            self.pub_servo.publish(0)
+
             # print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
 
         else:
@@ -144,8 +146,8 @@ class BotManeuver:
             else:
                 self.pub_servo.publish(0)
                 self.dropped = False
-                self.success = True
                 self.drop_count = 0
+                self.success = True
 
     def callback(self, data):
         try:

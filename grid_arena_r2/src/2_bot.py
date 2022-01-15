@@ -17,16 +17,16 @@ bot_color2 = (0,0,255)
 def fibonacci_client():
     print('init client')
 
-    
-    
+
+
     initial1=dock2 = [0,4]
     initial2=dock1 = [0,9]
     m=n=0
-    station2,station1 = give_destination('/home/adyasha/flipkart_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
+    station2,station1 = give_destination('/home/pranav/Desktop/cyborg_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
     agent1_dropped = 0
     agent2_dropped = 0
 
-    
+
     agent1_dest = station1[0][2]
     agent2_dest = station2[0][2]
 
@@ -35,7 +35,7 @@ def fibonacci_client():
         if type(initial1) == dict:
             initial1 = findDiscreteCoordinates(initial1)
             initial2 = findDiscreteCoordinates(initial2)
-        
+
         schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest )
 
         agent1_rc = findCoordinates(schedule,"agent0")
@@ -47,9 +47,9 @@ def fibonacci_client():
         #     print(element)
         #     print(findDiscreteCoordinates(element))
         # exit()
-    
-        
-        
+
+
+
         agent1_end = agent1_rc[-1]
         agent2_end = agent2_rc[-1]
 
@@ -63,12 +63,12 @@ def fibonacci_client():
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
         # print("after ", findDiscreteCoordinates(initial1), agent1_dest,findDiscreteCoordinates(initial2), agent2_dest)
 
-        
-       
+
+
 def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped):
     # print('complete_iter entered')
     # print('Verifying Goal Coordinates for agent1')
-    
+
     i=j=0
     len1 = len(agent1_rc)
     len2 = len(agent2_rc)
@@ -104,7 +104,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             client_2.send_goal(goal)
 
             client.wait_for_result() and client_2.wait_for_result()
-           
+
             print('result received')
             if i<len1-1:
                 i+=1
@@ -139,10 +139,10 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 print("client 2 delivering")
                 client.wait_for_result()
 
-            
+
 
     return agent1_rc[i],agent2_rc[j],agent1_dropped,agent2_dropped
-    
+
 
 
 def where_to_where(dropped,current ,dock,dest,next_dest,iter):
@@ -171,7 +171,7 @@ def rotate_to_drop(coord):
     return rotated_coor
 
 
-    
+
 
 if __name__ == '__main__':
     try:
