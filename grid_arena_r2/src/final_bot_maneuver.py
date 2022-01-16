@@ -36,9 +36,9 @@ class BotManeuver:
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.51, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.52, 'KD': 4.75, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 0: #PCB Marked 2
-            self.params = {'KP': 0.54, 'KD': 4.4, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.55, 'KD': 4.75, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -122,7 +122,7 @@ class BotManeuver:
             self.success = True
 
     def Rotate(self, error, abs_angle_diff):
-        if abs_angle_diff > 0.5:
+        if abs_angle_diff > 0.6:
             if error > 3.14:
                 ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
             elif error < -3.14:
@@ -144,6 +144,7 @@ class BotManeuver:
                 self.pub_servo.publish(1)
                 self.drop_count += 1
             else:
+                rospy.sleep(3)
                 self.pub_servo.publish(0)
                 self.dropped = False
                 self.drop_count = 0
