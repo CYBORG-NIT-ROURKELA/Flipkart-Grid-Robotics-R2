@@ -18,6 +18,9 @@ class ImageFeed:
         cap = cv.VideoCapture(device_index, cv.CAP_V4L)
         while not rospy.is_shutdown() and cap.isOpened():
             ret, frame = cap.read()
+            # frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            # clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+            # frame = clahe.apply(frame)
             if ret:
                 # cap.set(3, 640)
                 # cap.set(4, 480)

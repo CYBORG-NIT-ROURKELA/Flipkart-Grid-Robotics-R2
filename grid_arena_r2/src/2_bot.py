@@ -6,7 +6,7 @@ from centroids import findCoordinates, findDiscreteCoordinates, RealToDiscrete, 
 from grid_arena_r2.msg import botAction, botGoal
 import actionlib
 import rospy
-# import time
+import time
 
 import cv2 as cv
 
@@ -56,7 +56,7 @@ def fibonacci_client():
 
         agent1_state = agent1_rc[0]
         agent2_state = agent2_rc[0]
-
+        time.sleep(3)
         agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped)
         # print("before", findDiscreteCoordinates(agent1_state),findDiscreteCoordinates(agent2_state))
         initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
@@ -74,7 +74,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     len2 = len(agent2_rc)
 
     client = actionlib.SimpleActionClient('botAction_1', botAction)
-    client_2 = actionlib.SimpleActionClient('botAction_0', botAction)
+    client_2 = actionlib.SimpleActionClient('botAction_6', botAction)
 
     client.wait_for_server()
     print("client 1 connected")

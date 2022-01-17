@@ -36,9 +36,9 @@ class BotManeuver:
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.52, 'KD': 4.75, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 0: #PCB Marked 2
-            self.params = {'KP': 0.55, 'KD': 4.75, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.59, 'KD': 4.8, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 6: #PCB Marked 2
+            self.params = {'KP': 0.64, 'KD': 4.8, 'KI': 0, 'SP': 0.6}
 
         #self.rate = rospy.Rate(100)
 
@@ -53,7 +53,7 @@ class BotManeuver:
         print(self.tag_id)
 
         #Threshold distance for bot halting
-        self.thresh_dist = 9
+        self.thresh_dist = 8
 
         self.dropped = False
         self.drop_count = 0
@@ -159,6 +159,7 @@ class BotManeuver:
             results = detect_apriltag(image, self.detector, self.tag_id)
 
             if results is None or self.goal_array is None or len(results) == 0:
+                print("bot_"+str(self.tag_id)+"_stopped")
                 self.stop()
             # if results is None:
                 # print('No apriltag detected')
@@ -212,36 +213,12 @@ class BotManeuver:
 
         if len(goal.order)==5:
             self.dropped = True
-        # if self.goal_array == self.prev_goal:
-        #     self.success = True
-
-        # append the seeds for the fibonacci sequence
-        # self._feedback.sequence = []
-        # self._feedback.sequence.append(0)
-        # self._feedback.sequence.append(1)
-
-        # publish info to the console for the user
-        # rospy.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (self._action_name, goal.order, self._feedback.sequence[0], self._feedback.sequence[1]))
 
         while True:
             if self.success is False:
                 continue
             else:
                 break
-
-        # start executing the action
-        # for i in range(1, goal.order):
-        #     # check that preempt has not been requested by the client
-        #     if self._as.is_preempt_requested():
-        #         rospy.loginfo('%s: Preempted' % self._action_name)
-        #         self._as.set_preempted()
-        #         success = False
-        #         break
-        #     self._feedback.sequence.append(self._feedback.sequence[i] + self._feedback.sequence[i-1])
-        #     # publish the feedback
-        #     self._as.publish_feedback(self._feedback)
-        #     # this step is not necessary, the sequence is computed at 1 Hz for demonstration purposes
-        #     r.sleep()
 
         if self.success:
             # self._result.sequence = self._feedback.sequence
@@ -263,4 +240,3 @@ if __name__ == '__main__':
         result = BotManeuver('botAction', args)
     except rospy.ROSInterruptException:
         pass
-        # print("program interrupted before completion", file=sys.stderr)
