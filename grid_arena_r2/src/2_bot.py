@@ -7,14 +7,34 @@ from grid_arena_r2.msg import botAction, botGoal
 import actionlib
 import rospy
 import time
-
-import cv2 as cv
+import csv
+import numpy as np
+# import cv2 as cv
 
 bot_color1 = (0,255,0)
 bot_color2 = (0,0,255)
 
+def give_cities(file_path):
+    file = open(file_path)
+    csvreader = csv.reader(file)
+    station1_cities = []
+    station2_cities  = []
+    for row in csvreader:
+        if row[1]=='1':
+            station1_cities.append(row)
+        elif row[1] == '2':
+            station2_cities.append(row)
+    file.close()
+    return station1_cities, station2_cities
+#
+# city1,city2 = give_cities('/home/pranav/Desktop/cyborg_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
+# print(city1)
+# print("======================")
+# print(city2)
+# exit(0)
+
 # cap = cv.VideoCapture(2)
-def fibonacci_client():
+def path_client():
     print('init client')
 
 
@@ -25,24 +45,35 @@ def fibonacci_client():
     station2,station1 = give_destination('/home/pranav/Desktop/cyborg_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
     agent1_dropped = 0
     agent2_dropped = 0
-
+    city1,city2 = give_cities('/home/pranav/Desktop/cyborg_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
 
     agent1_dest = station1[0][2]
     agent2_dest = station2[0][2]
 
     while m<len(station1) and n<len(station2):
-        # print(initial1 , agent1_dest ,initial2, agent2_dest )
         if type(initial1) == dict:
             initial1 = findDiscreteCoordinates(initial1)
             initial2 = findDiscreteCoordinates(initial2)
 
         schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest )
-
+        # blank_image = np.zeros((300,800,3), np.uint8)
+        # cv.putText(blank_image, "package "+ city1[m][0]+" bot 1 to "+city1[m][2], (30,100), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv.LINE_AA)
+        # cv.putText(blank_image, "package "+ city2[n][0]+" bot 2 to "+city2[n][2], (30,200), cv.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 2, cv.LINE_AA)
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
-        # print(schedule)
+
+        print("package "+ city1[m][0]+" bot 1 to "+city1[m][2])
+        print("package "+ city2[n][0]+" bot 2 to "+city2[n][2])
+
+        # cv.imshow("image", blank_image)
+        # # cv.waitKey()
+        # # exit(0)
+        # cv.waitKey(1000)
+        # cv.destroyAllWindows()
+        # if cv.waitKey(1) == 27:
+        #     cv.destroyAllWindows()
+
         # print("agent1rc",agent1_rc)
-        # print("agent2rc",agent2_rc)
         # for element in agent1_rc:
         #     print(element)
         #     print(findDiscreteCoordinates(element))
@@ -56,12 +87,11 @@ def fibonacci_client():
 
         agent1_state = agent1_rc[0]
         agent2_state = agent2_rc[0]
-        time.sleep(3)
+        # time.sleep(1.5)
         agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped)
-        # print("before", findDiscreteCoordinates(agent1_state),findDiscreteCoordinates(agent2_state))
+        print("Number of packages delivered : ", m+n+1)
         initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
-        # print("after ", findDiscreteCoordinates(initial1), agent1_dest,findDiscreteCoordinates(initial2), agent2_dest)
 
 
 
@@ -74,7 +104,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     len2 = len(agent2_rc)
 
     client = actionlib.SimpleActionClient('botAction_1', botAction)
-    client_2 = actionlib.SimpleActionClient('botAction_6', botAction)
+    client_2 = actionlib.SimpleActionClient('botAction_7', botAction)
 
     client.wait_for_server()
     print("client 1 connected")
@@ -86,8 +116,8 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     else:
         len2+=1
     while i<len1-1 and j<len2-1:
-            goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"],agent1_state["x_c"],agent1_state["y_c"]]]
-            goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"],agent2_state["x_c"],agent2_state["y_c"]]]
+            goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]+2,agent1_state["x_c"],agent1_state["y_c"]+2]]
+            goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]+2,agent2_state["x_c"],agent2_state["y_c"]+2]]
 
 
             print("client 1 moving from => "+str(RealToDiscrete([agent1_state["x_c"],agent1_state["y_c"]])) + " => "+ str(RealToDiscrete([agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]])))
@@ -132,7 +162,6 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 agent2_dropped = 1
                 print("agent2 reached")
                 rotated_cord = rotate_to_drop(agent2_state)
-
                 goal2 = [[rotated_cord[0], rotated_cord[1], agent2_state['x_c'], agent2_state['y_c'], 1]]
                 goal = botGoal(order = goal2[0])
                 client.send_goal(goal)
@@ -176,6 +205,6 @@ def rotate_to_drop(coord):
 if __name__ == '__main__':
     try:
         rospy.init_node('fibonacci_client_py')
-        fibonacci_client()
+        path_client()
     except rospy.ROSInterruptException:
         print("program interrupted before completion")

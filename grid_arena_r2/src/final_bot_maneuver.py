@@ -28,19 +28,19 @@ class BotManeuver:
         self._action_name = str(name)+'_'+str(args.tag_id)
 
         print(self._action_name)
+
         #Publisher
         self.pub_twist = rospy.Publisher('grid_robot_{}/cmd_vel'.format(args.tag_id), Twist, queue_size=10)
         self.pub_servo = rospy.Publisher('grid_robot_{}/servo_angle'.format(args.tag_id), Int64, queue_size = 1)
+
         #multiplying factor
         self.rotation_param = 32
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.59, 'KD': 4.8, 'KI': 0, 'SP': 0.6}
-        elif args.tag_id == 6: #PCB Marked 2
-            self.params = {'KP': 0.64, 'KD': 4.8, 'KI': 0, 'SP': 0.6}
-
-        #self.rate = rospy.Rate(100)
+            self.params = {'KP': 0.55, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
+        elif args.tag_id == 7: #PCB Marked 2
+            self.params = {'KP': 0.64, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
 
         #msgs
         self.msg_twist = Twist()
@@ -66,7 +66,6 @@ class BotManeuver:
         self.image = None
 
         self.intg, self.last_error = 0.0, 0.0
-        # self.rate.sleep()
 
         #action server
         self._as = actionlib.SimpleActionServer(self._action_name, botAction, execute_cb=self.execute_cb, auto_start = False)
@@ -113,8 +112,6 @@ class BotManeuver:
 
             self.pub_servo.publish(0)
 
-            # print("Following...Linear velocity: {}; Angular velocity: {}".format(linear_vel, ang_vel))
-
         else:
             self.stop()
             print("reached target coordinate")
@@ -122,7 +119,7 @@ class BotManeuver:
             self.success = True
 
     def Rotate(self, error, abs_angle_diff):
-        if abs_angle_diff > 0.6:
+        if abs_angle_diff > 0.55:
             if error > 3.14:
                 ang_vel = self.pid(self.rotation_param*(error-6.28), self.params)
             elif error < -3.14:
@@ -141,10 +138,12 @@ class BotManeuver:
         else:
             self.stop()
             if self.drop_count == 0:
+                self.stop()
                 self.pub_servo.publish(1)
                 self.drop_count += 1
             else:
-                rospy.sleep(3)
+                self.stop()
+                rospy.sleep(2)
                 self.pub_servo.publish(0)
                 self.dropped = False
                 self.drop_count = 0
@@ -207,7 +206,6 @@ class BotManeuver:
 
     def execute_cb(self, goal):
         self.success = False
-        # r = rospy.Rate(1)
         self.goal_array = [(goal.order[0],goal.order[1]), (goal.order[2], goal.order[3])]
         print('Incoming Goal ', self.goal_array, ' Previous Goal ', self.prev_goal)
 
@@ -221,7 +219,6 @@ class BotManeuver:
                 break
 
         if self.success:
-            # self._result.sequence = self._feedback.sequence
             self.prev_goal = self.goal_array
             self.goal_array = None
             rospy.loginfo('%s: Succeeded' % self._action_name)
