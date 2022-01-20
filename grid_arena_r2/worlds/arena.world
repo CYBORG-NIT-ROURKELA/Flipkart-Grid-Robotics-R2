@@ -31,14 +31,14 @@
     </model>
 
     <model name="grid_robot_2">
-      <pose>1.0954 0.3592 0 0 0 0</pose>
+      <pose>-0.960656 0.967316 0 0 0 0</pose>
         <include>
             <uri>model://grid_robot_description_2</uri>
         </include>
     </model>
 
     <model name="grid_robot_3">
-      <pose>1.0954 -0.3592 0 0 0 0</pose>
+      <pose>-0.960656 -0.967316 0 0 0 0</pose>
         <include>
             <uri>model://grid_robot_description_3</uri>
         </include>

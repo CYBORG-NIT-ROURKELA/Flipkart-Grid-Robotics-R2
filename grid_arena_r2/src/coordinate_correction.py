@@ -44,6 +44,7 @@ class Planned_path:
             image = cv_image.copy()
             cv.imshow('image', image)
             cv.imshow('img', img)
+            cv.imwrite('image1.png',img)
 
         except CvBridgeError as e:
             print(e)
