@@ -80,7 +80,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     # print("client 1 connected")
     # client_2.wait_for_server()
     # print("client 1 connected")
-    _, image = cap.read()
+    image = cv2.imread('pranav.png')
 
     if len1>len2:
         len1+=1

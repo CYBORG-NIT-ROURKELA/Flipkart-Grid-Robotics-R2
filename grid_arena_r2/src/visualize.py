@@ -5,8 +5,8 @@ Created on Wed Jan 05 20:33:59 2022
 @author: Adyasha
 """
 from destination import give_destination
-from schedule import find_schedule
-from centroids import findCoordinates, findDiscreteCoordinates
+from schedule import find_schedule, find_schedule2
+from centroids import findCoordinates, findDiscreteCoordinates, findRealCoordinates
 import time
 from grid_arena_r2.msg import botAction, botGoal
 import actionlib
@@ -52,28 +52,22 @@ def fibonacci_client():
     print('init client')
     global m,n
     m=n=0
-
+  
     agent1 = Bot(dock2,0,station1[m][2],dock2,pseudodock2)
     agent2 = Bot(dock1,0,station2[n][2],dock1,pseudodock1)
     agent3 = Bot(pseudodock2,0,dock2,dock2,pseudodock2)
     agent4 = Bot(pseudodock1,0,dock1,dock1,pseudodock1)
-    # print(str(agent2))
-    # print(str(agent4))
-    # time.sleep(5)
-
+   
     while m<len(station1) and n<len(station2):
-        
-        
-        image = cv.imread('image1.png')
-     
+       
         if type(agent1.initial) == dict:
             agent1.initial = findDiscreteCoordinates(agent1.initial)
             agent2.initial = findDiscreteCoordinates(agent2.initial)
             agent3.initial = findDiscreteCoordinates(agent3.initial)
             agent4.initial = findDiscreteCoordinates(agent4.initial)
-        
-        schedule = find_schedule(agent1.initial , agent1.destination ,agent2.initial, agent2.destination ,agent3.initial,agent3.destination,agent4.initial,agent4.destination)
        
+        schedule = find_schedule(agent1.initial , agent1.destination ,agent2.initial, agent2.destination ,agent3.initial,agent3.destination,agent4.initial,agent4.destination)
+        
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
         agent3_rc = findCoordinates(schedule,"agent2")
@@ -84,74 +78,69 @@ def fibonacci_client():
         agent3.update(agent3_rc)
         agent4.update(agent4_rc)
        
-        m,n = complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4,image)
+        m,n = complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4)
+        
         from_where_to_where(agent1,agent1.state,agent3,agent3.state,dock2,pseudodock2)
         from_where_to_where(agent2,agent2.state,agent4,agent4.state,dock1,pseudodock1)
             
-def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4,image):
-
-    print(m+1," packet from station 1 ",n+1," packet from station 2 ")
-    # print 
-    # print(m+1,"packet from station 1")
-    print("agent1  ",str(agent1))
+def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4):
+    
+    # print(m+1," packet from station 1 ",n+1," packet from station 2 ")
+    
+    print ("agent1  ",str(agent1))
     print ("agent2  ",str(agent2))
     print ("agent3  ",str(agent3))
     print ("agent4  ",str(agent4))
     
-
+    
     i=j=k=l=0
+    image = cv.imread("pranav.png")
+    
+            
 
     len1 = append_coordinates(agent1_rc)
     len2 = append_coordinates(agent2_rc)
     len3 = append_coordinates(agent3_rc)
     len4 = append_coordinates(agent4_rc)
-    client = actionlib.SimpleActionClient('botAction_1', botAction)
-    client_2 = actionlib.SimpleActionClient('botAction_2', botAction)
-    client_3= actionlib.SimpleActionClient('botAction_3', botAction)
-    client_4 = actionlib.SimpleActionClient('botAction_4', botAction)
 
-    client.wait_for_server()
-    print("client 1 connected")
-    client_2.wait_for_server()
-    print("client 1 connected")
-    client_3.wait_for_server()
-    print("client 1 connected")
-    client_4.wait_for_server()
-    print("client 1 connected")
-
-
+    
    
     while i<len1-1 and j<len2-1 and k<len3-1 and l<len4-1:
-            image = cv.imread("image1.png")
+        print(len2,j,findDiscreteCoordinates(agent2.state),agent2.state)
+       
     
-            cv.arrowedLine(image, (agent1.state["x_c"],agent1.state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
-            cv.arrowedLine(image, (agent2.state["x_c"],agent2.state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot_color2, 2)
-            cv.arrowedLine(image, (agent3.state["x_c"],agent3.state["y_c"]), (agent3_rc[k+1]["x_c"],agent3_rc[k+1]["y_c"]), bot_color3, 2)
-            cv.arrowedLine(image, (agent4.state["x_c"],agent4.state["y_c"]), (agent4_rc[l+1]["x_c"],agent4_rc[l+1]["y_c"]), bot_color4, 2)
+        cv.arrowedLine(image, (agent1.state["x_c"],agent1.state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
+        cv.arrowedLine(image, (agent2.state["x_c"],agent2.state["y_c"]), (agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]), bot_color2, 2)
+        cv.arrowedLine(image, (agent3.state["x_c"],agent3.state["y_c"]), (agent3_rc[k+1]["x_c"],agent3_rc[k+1]["y_c"]), bot_color3, 2)
+        cv.arrowedLine(image, (agent4.state["x_c"],agent4.state["y_c"]), (agent4_rc[l+1]["x_c"],agent4_rc[l+1]["y_c"]), bot_color4, 2)
 
-            cv.imshow('image',image)
+        
 
-            if cv.waitKey(50)==27:
-                cv.destroyAllWindows()
-                break
+        if i<len1-1:
+            i+=1
+        if j<len2-1:
+            j+=1
+        if k<len3-1:
+            k+=1
+        if l<len4-1:
+            l+=1
+        agent1.state = agent1_rc[i]
+        agent2.state =  agent2_rc[j]
+        agent3.state = agent3_rc[k]
+        agent4.state = agent4_rc[l]
+         
+        a = deepcopy(agent2.state)
+        print(agent2.state)
+        print(findDiscreteCoordinates(a))
 
-            if i<len1-1:
-                i+=1
-            if j<len2-1:
-                j+=1
-            if k<len3-1:
-                k+=1
-            if l<len4-1:
-                l+=1
-            agent1.state = agent1_rc[i]
-            agent2.state =  agent2_rc[j]
-            agent3.state = agent3_rc[k]
-            agent4.state = agent4_rc[l]
-
-            m=update_next_goal(agent1,m,station1)
-            n=update_next_goal(agent2,n,station2)
-            m=update_next_goal(agent3,m,station1)
-            n=update_next_goal(agent4,n,station2)
+        m,image=update_next_goal(agent1,m,station1,image)
+        n,image=update_next_goal(agent2,n,station2,image)
+        m,image =update_next_goal(agent3,m,station1,image)
+        n,image =update_next_goal(agent4,n,station2,image)
+        cv.imshow("image2", image)
+        if cv.waitKey(800) == 27:
+            cv.destroyAllWindows()
+            break
 
     return m,n
 
@@ -187,6 +176,17 @@ def from_where_to_where(agent_a,current1,agent_b,current2,dock,pseudo):
     agent_a.destination = final1
     agent_b.initial = current2
     agent_b.destination = final2
+'''find the dropping coordinate'''
+def rotate_to_drop(coord):
+    b = findDiscreteCoordinates(coord)
+    if b[1]==1 or b[1]==5 or b[1]==9:
+        b[1]+=1
+    elif b[1]==4 or b[1]==8 or b[1]==12:
+        b[1]-=1
+    else:
+        b[0]+=1
+    rotated_coor = findRealCoordinates(b)
+    return rotated_coor
 
 '''update single coordinate list'''
 
@@ -197,7 +197,7 @@ def append_coordinates(goal_list):
 
 '''update goals after any agent completes destination list'''
 
-def update_next_goal(agent,iter,station):
+def update_next_goal(agent,iter,station,image):
     if findDiscreteCoordinates(agent.state) == agent.dock:
         print("agent home")
         agent.dropped = 0
@@ -205,7 +205,9 @@ def update_next_goal(agent,iter,station):
         agent.destination = station[iter][2]
     elif agent.state == agent.last and findDiscreteCoordinates(agent.state)!=agent.pseudodock:
         agent.dropped = 1
-    return iter   
+        # rotated_cord = rotate_to_drop(agent.state)
+        # cv.circle(image, tuple(rotated_cord), 3, (255,255,255), -1)
+    return iter , image 
 
 if __name__ == '__main__':
     try:
