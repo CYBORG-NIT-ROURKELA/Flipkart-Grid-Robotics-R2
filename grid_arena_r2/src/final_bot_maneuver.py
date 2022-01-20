@@ -38,7 +38,7 @@ class BotManeuver:
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.55, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.59, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 7: #PCB Marked 2
             self.params = {'KP': 0.64, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
 
