@@ -44,5 +44,29 @@ def give_destination(file_path):
 
     file.close()
     return [station1,station2]
+def give_cities(file_path):
+   
+
+    file = open(file_path)
+    csvreader = csv.reader(file)
+   
+    station1_cities = []
+    station2_cities  = []
+    for row in csvreader:
+        
+        if row[1]=='1':
+        
+            station1_cities.append(row)
+            
+            
+        elif row[1]=='2':
+            station2_cities.append(row)
+
+   
+
+    file.close()
+    return station1_cities, station2_cities
+
+
 
 

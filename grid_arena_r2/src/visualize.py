@@ -4,7 +4,7 @@ Created on Wed Jan 05 20:33:59 2022
 
 @author: Adyasha
 """
-from destination import give_destination
+from destination import give_destination, give_cities
 from schedule import find_schedule, find_schedule2
 from centroids import findCoordinates, findDiscreteCoordinates, findRealCoordinates
 import time
@@ -22,13 +22,14 @@ bot_color4 = (25,127,127)
 '''To read the csv files and store corresponding destination coordinates'''
 
 station1,station2 = give_destination('/home/adyasha/flipkart_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
+city1,city2 = give_cities('/home/adyasha/flipkart_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
 
 '''pseudodock for bot to wait till actual dock gets emptied'''
 
 dock2 = [0,4]
 dock1 = [0,9]
 pseudodock2=[1,0]
-pseudodock1=[1,12]
+pseudodock1=[1,13]
 
 class Bot:
     def __init__(self,start,drop_state,dest,home,pseudohome):
@@ -85,16 +86,17 @@ def fibonacci_client():
             
 def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_rc,agent4):
     
-    # print(m+1," packet from station 1 ",n+1," packet from station 2 ")
-    
-    print ("agent1  ",str(agent1))
-    print ("agent2  ",str(agent2))
-    print ("agent3  ",str(agent3))
-    print ("agent4  ",str(agent4))
+    print('Package ID {} dispatched from inductzone 1 to {}'.format(city1[m][0],city1[m][2]))
+   
+    print('Package ID {} dispatched from inductzone 2 to {}'.format(city2[n][0],city2[n][2]))
+    # print ("agent1  ",str(agent1))
+    # print ("agent2  ",str(agent2))
+    # print ("agent3  ",str(agent3))
+    # print ("agent4  ",str(agent4))
     
     
     i=j=k=l=0
-    image = cv.imread("pranav.png")
+    image = cv.imread("image1.png")
     
             
 
@@ -106,7 +108,7 @@ def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_
     
    
     while i<len1-1 and j<len2-1 and k<len3-1 and l<len4-1:
-        print(len2,j,findDiscreteCoordinates(agent2.state),agent2.state)
+        # print(len2,j,findDiscreteCoordinates(agent2.state),agent2.state)
        
     
         cv.arrowedLine(image, (agent1.state["x_c"],agent1.state["y_c"]), (agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]), bot_color1, 2)
@@ -130,8 +132,8 @@ def complete_iter(m,n,agent1_rc,agent1,agent2_rc,agent2,agent3_rc,agent3,agent4_
         agent4.state = agent4_rc[l]
          
         a = deepcopy(agent2.state)
-        print(agent2.state)
-        print(findDiscreteCoordinates(a))
+        # print(agent2.state)
+        # print(findDiscreteCoordinates(a))
 
         m,image=update_next_goal(agent1,m,station1,image)
         n,image=update_next_goal(agent2,n,station2,image)
@@ -153,13 +155,13 @@ def from_where_to_where(agent_a,current1,agent_b,current2,dock,pseudo):
             final2 = agent_b.destination
         else:
           
-            print(agent_a.destination,agent_b.destination)
+            # print(agent_a.destination,agent_b.destination)
             agent_a.destination = deepcopy(agent_b.destination)
             agent_a.destination[0] += 1
             
             final1 = agent_a.destination
             final2 = agent_b.destination
-            print(final1,final2)
+            # print(final1,final2)
     if agent_a.dropped==1 and agent_b.dropped==1:
         final1= dock
         final2 = pseudo
@@ -199,7 +201,7 @@ def append_coordinates(goal_list):
 
 def update_next_goal(agent,iter,station,image):
     if findDiscreteCoordinates(agent.state) == agent.dock:
-        print("agent home")
+        # print("agent home")
         agent.dropped = 0
         iter+=1
         agent.destination = station[iter][2]
