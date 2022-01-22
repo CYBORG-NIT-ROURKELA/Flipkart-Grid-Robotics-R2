@@ -33,6 +33,7 @@ def fibonacci_client():
 
         print(agent1_dest, agent2_dest)
         schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest)
+        print(schedule)
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
         
@@ -41,7 +42,7 @@ def fibonacci_client():
 
         agent1_state = agent1_rc[0]
         agent2_state = agent2_rc[0]
-
+        print("Total packages delivered ", m+n)
         agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped, image)
         initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
