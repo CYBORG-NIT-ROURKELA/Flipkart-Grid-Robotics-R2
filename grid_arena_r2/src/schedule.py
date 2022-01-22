@@ -42,6 +42,15 @@ def find_schedule2(start_1,goal_1,start_2,goal_2):
     # Searching
     cbs = CBS(env)
     solution = cbs.search()
+    i = 0
+    while True:
+        i+=1
+        if solution is not None:
+            break
+        if i == 10:
+            break
+        cbs = CBS(env)
+        solution = cbs.search()
     if not solution:
         print(" Solution not found" )
         return

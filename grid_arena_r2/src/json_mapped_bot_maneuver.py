@@ -4,7 +4,7 @@ from destination import give_destination
 from schedule import find_schedule2
 from centroids import findCoordinates, findDiscreteCoordinates, findRealCoordinates
 import cv2
-import json
+import json, time
 
 bot1_color = (255,0,0)
 bot2_color = (0,255,0)
@@ -25,7 +25,9 @@ def fibonacci_client():
     agent1_dest = station1[0][2]
     agent2_dest = station2[0][2]
 
-    while m<len(station1) and n<len(station2):
+    schedule_lists = json.load(open('schedule_list.json'))
+
+    for i in range(len(schedule_lists)):
         image = cv2.imread('image1.png')
         if type(initial1) == dict:
             initial1 = findDiscreteCoordinates(initial1)
@@ -33,20 +35,11 @@ def fibonacci_client():
         
         cv2.drawMarker(image, tuple(findRealCoordinates(agent2_dest)), bot2_color,1,10,3)
         cv2.drawMarker(image, tuple(findRealCoordinates(agent1_dest)), bot1_color,1,10,3)
-
-        print(agent1_dest, agent2_dest)
-        schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest)
-        if schedule is None:
-            with open("schedule_list.json", "w") as final:
-                json.dump(schedule_lists, final, indent=4)
-        schedule_lists.append(schedule)
-        print(schedule)
+        schedule = schedule_lists[i]
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
-        
         agent1_end = agent1_rc[-1]
         agent2_end = agent2_rc[-1]
-
         agent1_state = agent1_rc[0]
         agent2_state = agent2_rc[0]
         print("Total packages delivered ", m+n)
@@ -54,6 +47,32 @@ def fibonacci_client():
         initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
     cv2.destroyAllWindows()
+
+    # while m<len(station1) and n<len(station2):
+    #     image = cv2.imread('image1.png')
+    #     if type(initial1) == dict:
+    #         initial1 = findDiscreteCoordinates(initial1)
+    #         initial2 = findDiscreteCoordinates(initial2)
+        
+    #     cv2.drawMarker(image, tuple(findRealCoordinates(agent2_dest)), bot2_color,1,10,3)
+    #     cv2.drawMarker(image, tuple(findRealCoordinates(agent1_dest)), bot1_color,1,10,3)
+
+    #     print(agent1_dest, agent2_dest)
+    #     schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest)
+        
+    #     agent1_rc = findCoordinates(schedule,"agent0")
+    #     agent2_rc = findCoordinates(schedule,"agent1")
+        
+    #     agent1_end = agent1_rc[-1]
+    #     agent2_end = agent2_rc[-1]
+
+    #     agent1_state = agent1_rc[0]
+    #     agent2_state = agent2_rc[0]
+    #     print("Total packages delivered ", m+n)
+    #     agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped, image)
+    #     initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
+    #     initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
+    # cv2.destroyAllWindows()
 
         
        
@@ -103,7 +122,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 agent2_dropped = 1
             
             cv2.imshow("image2", image)
-            if cv2.waitKey(10) == 27:
+            if cv2.waitKey(500) == 27:
                 cv2.destroyAllWindows()
                 break
 
