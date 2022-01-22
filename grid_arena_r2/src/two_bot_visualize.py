@@ -32,7 +32,6 @@ def fibonacci_client():
         cv2.drawMarker(image, tuple(findRealCoordinates(agent1_dest)), bot1_color,1,10,3)
 
         print(agent1_dest, agent2_dest)
-
         schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest)
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
@@ -96,7 +95,7 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 agent2_dropped = 1
             
             cv2.imshow("image2", image)
-            if cv2.waitKey(800) == 27:
+            if cv2.waitKey(100) == 27:
                 cv2.destroyAllWindows()
                 break
 
@@ -133,19 +132,19 @@ def rotate_to_drop(coord):
 
 def rotate_to_drop_vis(coord, image):
     b = findDiscreteCoordinates(coord)
-    print('asila1')
+    
     if b[1]==1 or b[1]==5 or b[1]==9:
         b[1]+=1
     elif b[1]==4 or b[1]==8 or b[1]==12:
         b[1]-=1
     else:
         b[0]+=1
-    print('asila2')
+    
     print(b)
     rotated_coor = findRealCoordinates(b)
-    print('asila3')
+    
     cv2.arrowedLine(image, (coord["x_c"],coord["y_c"]), tuple(rotated_coor), (127,127,100), 2)
-    print('asila4')
+    
     return rotated_coor, image
 
 

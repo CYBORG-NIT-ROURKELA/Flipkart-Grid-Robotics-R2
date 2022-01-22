@@ -32,6 +32,12 @@ class State(object):
         return self.time == other.time and self.location == other.location
     def __hash__(self):
         return hash(str(self.time)+str(self.location.x) + str(self.location.y))
+    def is_adjacent_except_time(self, state):
+        x, y = self.location.x, self.location.y
+        return state.location == Location(x+1, y) or \
+            state.location == Location(x-1, y) or \
+            state.location == Location(x, y+1) or \
+            state.location == Location(x, y-1)
     def is_equal_except_time(self, state):
         return self.location == state.location
     def __str__(self):
@@ -144,7 +150,7 @@ class Environment(object):
             for agent_1, agent_2 in combinations(solution.keys(), 2):
                 state_1 = self.get_state(agent_1, solution, t)
                 state_2 = self.get_state(agent_2, solution, t)
-                if state_1.is_equal_except_time(state_2):
+                if state_1.is_adjacent_except_time(state_2):
                     result.time = t
                     result.type = Conflict.VERTEX
                     result.location_1 = state_1.location
@@ -159,7 +165,7 @@ class Environment(object):
                 state_2a = self.get_state(agent_2, solution, t)
                 state_2b = self.get_state(agent_2, solution, t+1)
 
-                if state_1a.is_equal_except_time(state_2b) and state_1b.is_equal_except_time(state_2a):
+                if state_1a.is_adjacent_except_time(state_2b) and state_1b.is_adjacent_except_time(state_2a):
                     result.time = t
                     result.type = Conflict.EDGE
                     result.agent_1 = agent_1
