@@ -7,14 +7,14 @@ import rospy
 from geometry_msgs.msg import Twist
 import math
 from grid_arena_r2.msg import rpm
-from std_msgs.msg import UInt8
+from std_msgs.msg import Int64
 
 
 class Transmitter:
     def __init__(self, args):
         rospy.init_node('transmitter_{}'.format(args.topic_number))
         rospy.Subscriber('grid_robot_{}/cmd_vel'.format(args.topic_number), Twist, self.callback_twist)
-        rospy.Subscriber('grid_robot_{}/servo_angle'.format(args.topic_number), UInt8, self.callback_servo)
+        rospy.Subscriber('grid_robot_{}/servo_angle'.format(args.topic_number), Int64, self.callback_servo)
 
         self.ip = args.ip
         self.port = args.port

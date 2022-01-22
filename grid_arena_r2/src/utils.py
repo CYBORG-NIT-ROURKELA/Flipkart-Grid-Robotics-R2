@@ -28,4 +28,4 @@ def error_calculation(yi, yt, xt, xi, yc, ym, xc, xm):
     error = angle_target-angle_bot
 
     # return abs_angle_diff, error, euclidean_dist, angle_target, cross_track_error
-    return error, euclidean_dist
+    return error, euclidean_dist, abs_angle_diff
