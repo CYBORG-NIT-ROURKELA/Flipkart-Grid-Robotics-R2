@@ -67,7 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--telnet', action='store_true', help='use telnet flag')
     args = parser.parse_args()
 
-    rospy.loginfo("host: %s, port: %s", args.ip, args.port)
+    print("host: %s, port: %s", args.ip, args.port)
+
     tm = Transmitter(args)
     try:
         if not rospy.is_shutdown():
