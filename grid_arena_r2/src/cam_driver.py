@@ -37,7 +37,6 @@ class ImageFeed:
     def publish(self):
         self.pub.publish(self.msg)
 
-
 if __name__ == '__main__':
     try:
         image_feed = ImageFeed()
