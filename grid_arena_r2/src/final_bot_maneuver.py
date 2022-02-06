@@ -38,9 +38,9 @@ class BotManeuver:
 
         #PID Parameters for the bots
         if args.tag_id == 1: #PCB marked 1
-            self.params = {'KP': 0.59, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.61, 'KD': 4.7, 'KI': 0, 'SP': 0.6}
         elif args.tag_id == 7: #PCB Marked 2
-            self.params = {'KP': 0.64, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
+            self.params = {'KP': 0.66, 'KD': 4.6, 'KI': 0, 'SP': 0.6}
 
         #msgs
         self.msg_twist = Twist()
@@ -160,6 +160,9 @@ class BotManeuver:
             if results is None or self.goal_array is None or len(results) == 0:
                 print("bot_"+str(self.tag_id)+"_stopped")
                 self.stop()
+
+                if self.goal_array is None :
+                    print("No goal")
             # if results is None:
                 # print('No apriltag detected')
                 # pass

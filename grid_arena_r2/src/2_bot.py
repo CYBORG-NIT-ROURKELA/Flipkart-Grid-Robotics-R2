@@ -9,7 +9,7 @@ import rospy
 import time
 import csv
 import numpy as np
-# import cv2 as cv
+import json
 
 bot_color1 = (0,255,0)
 bot_color2 = (0,0,255)
@@ -26,14 +26,7 @@ def give_cities(file_path):
             station2_cities.append(row)
     file.close()
     return station1_cities, station2_cities
-#
-# city1,city2 = give_cities('/home/pranav/Desktop/cyborg_ws/src/Flipkart-Grid-Robotics-R2/grid_arena_r2/src/Sample Data - Sheet1.csv')
-# print(city1)
-# print("======================")
-# print(city2)
-# exit(0)
 
-# cap = cv.VideoCapture(2)
 def path_client():
     print('init client')
 
@@ -50,54 +43,33 @@ def path_client():
     agent1_dest = station1[0][2]
     agent2_dest = station2[0][2]
 
-    while m<len(station1) and n<len(station2):
+    schedule_lists = json.load(open('schedule_list.json'))
+
+    while(len(schedule_lists)):
+        schedule_lists = json.load(open('schedule_list.json'))
         if type(initial1) == dict:
             initial1 = findDiscreteCoordinates(initial1)
             initial2 = findDiscreteCoordinates(initial2)
-
-        schedule = find_schedule2(initial1 , agent1_dest ,initial2, agent2_dest )
-        # blank_image = np.zeros((300,800,3), np.uint8)
-        # cv.putText(blank_image, "package "+ city1[m][0]+" bot 1 to "+city1[m][2], (30,100), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv.LINE_AA)
-        # cv.putText(blank_image, "package "+ city2[n][0]+" bot 2 to "+city2[n][2], (30,200), cv.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 2, cv.LINE_AA)
+        schedule = schedule_lists[0]
         agent1_rc = findCoordinates(schedule,"agent0")
         agent2_rc = findCoordinates(schedule,"agent1")
-
         print("package "+ city1[m][0]+" bot 1 to "+city1[m][2])
         print("package "+ city2[n][0]+" bot 2 to "+city2[n][2])
-
-        # cv.imshow("image", blank_image)
-        # # cv.waitKey()
-        # # exit(0)
-        # cv.waitKey(1000)
-        # cv.destroyAllWindows()
-        # if cv.waitKey(1) == 27:
-        #     cv.destroyAllWindows()
-
-        # print("agent1rc",agent1_rc)
-        # for element in agent1_rc:
-        #     print(element)
-        #     print(findDiscreteCoordinates(element))
-        # exit()
-
-
-
         agent1_end = agent1_rc[-1]
         agent2_end = agent2_rc[-1]
 
-
         agent1_state = agent1_rc[0]
         agent2_state = agent2_rc[0]
-        # time.sleep(1.5)
-        agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped)
+        agent1_state,agent2_state,agent1_dropped,agent2_dropped = complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped,schedule_lists,schedule)
         print("Number of packages delivered : ", m+n+1)
         initial1,agent1_dest,m,agent1_dropped = where_to_where(agent1_dropped,agent1_state,dock2,agent1_dest,station1[m+1][2],m)
         initial2,agent2_dest,n,agent2_dropped = where_to_where(agent2_dropped,agent2_state,dock1,agent2_dest,station2[n+1][2],n)
+        schedule_lists.pop(0)
+        with open("schedule_list.json", "w") as final:
+            json.dump(schedule_lists, final, indent = 4)
 
 
-
-def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped):
-    # print('complete_iter entered')
-    # print('Verifying Goal Coordinates for agent1')
+def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,agent2_rc,agent2_end,agent2_dropped,schedule_lists,schedule):
 
     i=j=0
     len1 = len(agent1_rc)
@@ -116,8 +88,8 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
     else:
         len2+=1
     while i<len1-1 and j<len2-1:
-            goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]+2,agent1_state["x_c"],agent1_state["y_c"]+2]]
-            goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]+2,agent2_state["x_c"],agent2_state["y_c"]+2]]
+            goal_coords1 = [[agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]+3,agent1_state["x_c"],agent1_state["y_c"]+3]]
+            goal_coords2 = [[agent2_rc[j+1]["x_c"],agent2_rc[j+1]["y_c"]+3,agent2_state["x_c"],agent2_state["y_c"]+3]]
 
 
             print("client 1 moving from => "+str(RealToDiscrete([agent1_state["x_c"],agent1_state["y_c"]])) + " => "+ str(RealToDiscrete([agent1_rc[i+1]["x_c"],agent1_rc[i+1]["y_c"]])))
@@ -132,8 +104,12 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
             # Sends the goal to the action server.
             client.send_goal(goal2)
             client_2.send_goal(goal)
-
             client.wait_for_result() and client_2.wait_for_result()
+
+            schedule["schedule"]["agent0"].pop(0)
+            schedule["schedule"]["agent1"].pop(0)
+            with open("schedule_list.json", "w") as final:
+                json.dump(schedule_lists, final, indent = 4)
 
             print('result received')
             if i<len1-1:
@@ -167,8 +143,6 @@ def complete_iter(agent1_state,agent1_rc,agent1_end,agent1_dropped,agent2_state,
                 client.send_goal(goal)
                 print("client 2 delivering")
                 client.wait_for_result()
-
-
 
     return agent1_rc[i],agent2_rc[j],agent1_dropped,agent2_dropped
 

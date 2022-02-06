@@ -50,11 +50,12 @@ class Transmitter:
         msg = "{},{},{}\r".format(self.rpm2pwm(self.left_rpm),
                                   self.rpm2pwm(self.right_rpm),
                                   self.servo_angle)
-        rospy.loginfo(msg)
+        print(msg)
         if self.is_telnet:
             self.telnet.write(msg.encode('ascii'))
         else:
             self.sock.sendto(str.encode(msg), (self.ip, self.port))
+            # print(self.sock.recv())
 
 
 if __name__ == '__main__':
